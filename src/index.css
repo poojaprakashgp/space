@@ -1,0 +1,58 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  flex-direction: column;
+}
+
+.loginItem{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  row-gap:20px;
+}
+
+.listContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.listHead{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  gap:20px
+}
+
+.right{
+  margin-left: auto;
+}
+
+.listItemsContainer{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-start;
+  gap: 40px;
+  padding: 40px;
+}
+
+.notFound{
+  height: 100vh;
+  background-color: #f0f0f0;
+  margin: auto;
+}
