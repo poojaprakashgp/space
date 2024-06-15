@@ -17,7 +17,7 @@ This is a React application that displays a list of SpaceX launches. The app inc
 ### Installation
 1. Clone the repository:
    git clone https://github.com/poojaprakashgp/space
-   cd spacex-launches
+   cd space
 
 2. Install dependencies:
    npm install
