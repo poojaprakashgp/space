@@ -1,4 +1,4 @@
-function longestsunstr(s){
+function longestsubstr(s){
  let map = Array(128).fill(0);
  let count=0, end=0, begin=0, d=0, head=0;
  while(end<s.length){
@@ -18,10 +18,10 @@ function longestsunstr(s){
  return d
 }
 
-console.log(longestsunstr("acbbcdjas")) //logestsubstring with two distinct charector
+console.log(longestsubstr("acbbcdjas")) //logestsubstring with two distinct charector
 
 
-function longestsunstrWithoutRepeatingChar(s){
+function longestsubstrWithoutRepeatingChar(s){
  let map = Array(128).fill(0);
  let count=0, end=0, begin=0, d=0, head=0;
  while(end<s.length){
@@ -41,4 +41,4 @@ function longestsunstrWithoutRepeatingChar(s){
  return d
 }
 
-console.log(longestsunstrWithoutRepeatingChar("acbbcdjas"))
+console.log(longestsubstrWithoutRepeatingChar("acbbcdjas"))
