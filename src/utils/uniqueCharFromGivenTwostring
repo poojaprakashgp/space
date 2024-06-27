@@ -1,0 +1,29 @@
+let str1 = 'characters', str2 = 'alphabets'
+let len = Math.max(str1.length, str2.length);
+let i=0, map=new Map(), res=[];
+while(i<str1.length){
+ if(map.has(str1[i]) ){
+   map.set(str1[i], (map.get(str1[i])+1))
+ }else{
+ map.set(str1[i], 1)
+ }
+ i++;
+}
+let j=0;
+while(j<str2.length){
+ if(!map.has(str2[j])){
+   res.push(str2[j])
+ }else{
+  map.set(str2[j], (map.get(str2[j]) || 0)-1);
+  if(map.get(str2[j]) ==0){
+   map.delete(str2[j])
+  }
+ }
+ j++
+}
+if(map.size>0){
+  for(let [key, value] of map){
+     res.push(key)
+  }
+}
+console.log(res, map.size)
