@@ -18,6 +18,8 @@ function longestsubstr(s){
  return d
 }
 
+
+
 console.log(longestsubstr("acbbcdjas")) //logestsubstring with two distinct charector
 
 
