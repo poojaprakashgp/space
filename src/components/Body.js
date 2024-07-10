@@ -2,7 +2,8 @@ import React from 'react'
 import Login from './Login'
 import LaunchList from './LaunchList'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import ProtectedRoutes from './ProtectedRoutes'
+import ProtectedRoutes from './ProtectedRoutes';
+import ProgressBarContainer from './progressBarContainer.js';
 
 const Body = () => {
 
@@ -14,6 +15,10 @@ const Body = () => {
         {
             path: '/launch',
             element: <ProtectedRoutes><LaunchList /></ProtectedRoutes>
+        },
+        {
+            path: '/progressbar',
+            element: <ProgressBarContainer />
         }
     ])
   return (
