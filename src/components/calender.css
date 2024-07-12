@@ -1,0 +1,42 @@
+.container {
+  position: relative;
+  height: auto;
+  border: 1px solid black;
+  /* 24 hours * 60 minutes = 1440 minutes */
+}
+
+.hour {
+  position: relative;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  /* align-items: center; */
+  /* 1 hour block */
+}
+.hourborder{
+  border: 0.5px solid rgb(217, 206, 206);
+  border-left: none;
+  border-bottom: none;
+  border-right: none;
+  width: 100%;
+}
+
+.schedules {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80%;
+  height: 100%;
+}
+
+.schedule {
+  position: absolute;
+  right: 0;
+  box-sizing: border-box;
+  border: 1px solid #d7c3c3;
+}
+
+.schedule:hover{
+  z-index: 999;
+  cursor: pointer;
+}
