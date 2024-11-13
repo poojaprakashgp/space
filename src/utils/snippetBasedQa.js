@@ -30,3 +30,15 @@ const a=b;
 }
 cun();
 console.log(typeof a, typeof b, typeof c)
+
+let dummy={
+  price:199,
+  get_price:function(){
+   return this.price
+  }
+}
+let r = Object.create(dummy); // r will not have direct props of dummy instead 
+// r will be having prototype of dummy means when things not found in r it will look into dummy properties, so when you try to add prop which is there in dummy to r it get added as r's direct propety but still even after delete of r's direct property it will have dummy properties like price
+r.price = 299;
+delete r.price;
+console.log(r.get_price())
