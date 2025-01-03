@@ -80,3 +80,77 @@ promise.then(
     console.error('Catch:', error);
   }
 );
+
+(function (global) {
+  if (!global.Promise) {
+    global.Promise = class {
+      constructor(executor) {
+        this.callbacks = [];
+        this.state = "pending";
+        this.value = undefined;
+
+        const resolve = (value) => {
+          if (this.state !== "pending") return;
+          this.state = "fulfilled";
+          this.value = value;
+          this.callbacks.forEach((callback) => callback.onFulfilled(value));
+        };
+
+        const reject = (reason) => {
+          if (this.state !== "pending") return;
+          this.state = "rejected";
+          this.value = reason;
+          this.callbacks.forEach((callback) => callback.onRejected(reason));
+        };
+
+        try {
+          executor(resolve, reject);
+        } catch (error) {
+          reject(error);
+        }
+      }
+
+      then(onFulfilled, onRejected) {
+        return new Promise((resolve, reject) => {
+          const handleCallback = () => {
+            try {
+              const result =
+                this.state === "fulfilled"
+                  ? onFulfilled(this.value)
+                  : onRejected(this.value);
+              if (result instanceof Promise) {
+                result.then(resolve, reject);
+              } else {
+                resolve(result);
+              }
+            } catch (error) {
+              reject(error);
+            }
+          };
+
+          if (this.state === "pending") {
+            this.callbacks.push({
+              onFulfilled: () => handleCallback(),
+              onRejected: () => handleCallback(),
+            });
+          } else {
+            handleCallback();
+          }
+        });
+      }
+
+      catch(onRejected) {
+        return this.then(null, onRejected);
+      }
+
+      static resolve(value) {
+        return new Promise((resolve) => resolve(value));
+      }
+
+      static reject(reason) {
+        return new Promise((_, reject) => reject(reason));
+      }
+    };
+  }
+})(this);
+
