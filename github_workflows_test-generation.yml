@@ -1,0 +1,34 @@
+name: Test Generation
+
+on:
+  push:
+    paths:
+      - 'src/**/*.js'
+      - 'src/**/*.jsx'
+
+jobs:
+  generate-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate test files
+        run: node .github/scripts/generateTests.js
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add tests/
+          git commit -m 'Add initial test files for new src files'
+          git push
