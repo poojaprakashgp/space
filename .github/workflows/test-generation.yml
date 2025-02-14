@@ -26,6 +26,8 @@ jobs:
         run: node .github/scripts/generateTests.js
 
       - name: Commit and push changes
+        env:
+           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
