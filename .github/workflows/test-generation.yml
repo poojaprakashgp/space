@@ -27,10 +27,11 @@ jobs:
 
       - name: Commit and push changes
         env:
-           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://poojaprakashgp:${{ secrets.GH_TOKEN }}@github.com/poojaprakashgp/space.git
           git add tests/
           git commit -m 'Add initial test files for new src files'
-          git push https://poojaprakashgp:${GH_TOKEN}@github.com/poojaprakashgp/space.git HEAD:main
+          git push origin HEAD:main
