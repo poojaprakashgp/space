@@ -19,7 +19,8 @@ const Body = () => {
             path: '/progressbar',
             element: <ProgressBarContainer />
         }
-    ])
+    ]);
+    
   return (
     <div>
        <RouterProvider router={appRouter} />
