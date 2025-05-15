@@ -200,3 +200,72 @@ export default function PaymentPage() {
     }
   }
 }
+
+
+// payment.sass
+
+.payment-page
+display: flex
+justify-content: center
+align-items: center
+padding: 2rem
+background: #f5f5f5
+min-height: 100vh
+
+.payment-form
+background: #fff
+padding: 32px
+border-radius: 12px
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05)
+width: 100%
+max-width: 500px
+
+.payment-title
+font-size: 1.5rem
+margin-bottom: 24px
+color: #111
+
+.payment-checkbox
+display: flex
+align-items: center
+margin-bottom: 24px
+font-size: 0.95rem
+
+```
+input
+  width: 18px
+  height: 18px
+  margin-right: 8px
+  accent-color: #111
+
+span
+  color: #111
+```
+
+.row
+display: flex
+gap: 16px
+margin-bottom: 24px
+
+.submit-btn
+width: 100%
+padding: 12px
+margin-top: 16px
+font-size: 1rem
+font-weight: 600
+border: none
+border-radius: 8px
+background: #ccc
+color: #777
+cursor: not-allowed
+transition: background 0.2s
+
+```
+&.enabled
+  background: #d32f2f
+  color: #fff
+  cursor: pointer
+
+  &:hover
+    background: darken(#d32f2f, 10%)
+```
