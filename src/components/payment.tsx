@@ -1,167 +1,138 @@
-'use client';
-
-import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Grid,
-  TextField,
-  Typography,
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Checkbox, FormControlLabel, Button, Box, Grid, Typography } from '@mui/material';
 
 export default function PaymentForm() {
-  const [sameAsShipping, setSameAsShipping] = useState(false);
-
-  const [billingAddress, setBillingAddress] = useState({
-    firstName: '',
-    lastName: '',
-    address: '',
-    suite: '',
-    zipCode: '',
-    city: '',
-    state: '',
-    country: '',
-    phone: '',
-    email: '',
-  });
-
-  const [billingInfo, setBillingInfo] = useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     cardNumber: '',
-    expiration: '',
+    expiry: '',
     cvv: '',
+    sameAsShipping: true,
   });
 
-  const handleBillingAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBillingAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const [errors, setErrors] = useState({
+    cardNumber: false,
+    expiry: false,
+    cvv: false,
+    firstName: false,
+    lastName: false,
+  });
 
-  const handleBillingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBillingInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const [isCompleteEnabled, setIsCompleteEnabled] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Same as Shipping:', sameAsShipping);
-    console.log('Billing Address:', billingAddress);
-    console.log('Billing Info:', billingInfo);
+  useEffect(() => {
+    const isValidCard = /^\d{4} \d{4} \d{4} \d{4}$/.test(formData.cardNumber);
+    const isValidExpiry = /^(0[1-9]|1[0-2])\/\d{4}$/.test(formData.expiry);
+    const isValidCVV = /^\d{3}$/.test(formData.cvv);
+    const isValidFirst = formData.firstName.trim().length > 0;
+    const isValidLast = formData.lastName.trim().length > 0;
 
-    // Use Next.js 15 Server Actions here (mock example)
-    // await submitPayment({ billingAddress, billingInfo });
-    alert('Payment submitted successfully!');
+    setErrors({
+      cardNumber: !isValidCard,
+      expiry: !isValidExpiry,
+      cvv: !isValidCVV,
+      firstName: !isValidFirst,
+      lastName: !isValidLast,
+    });
+
+    setIsCompleteEnabled(isValidCard && isValidExpiry && isValidCVV && isValidFirst && isValidLast);
+  }, [formData]);
+
+  const handleChange = (field) => (e) => {
+    let value = e.target.value;
+    if (field === 'cardNumber') {
+      value = value.replace(/[^\d]/g, '').slice(0, 16);
+      value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+    if (field === 'cvv') {
+      value = value.replace(/[^\d]/g, '').slice(0, 3);
+    }
+    if (field === 'expiry') {
+      value = value.replace(/[^\d]/g, '').slice(0, 6);
+      if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2);
+    }
+    setFormData({ ...formData, [field]: value });
   };
 
   return (
-    <Box component="main" sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}>
-      <Typography variant="h5" component="h1" tabIndex={0}>
-        Payment & Billing Information
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Payment
       </Typography>
 
-      <form onSubmit={handleSubmit} aria-label="Payment form">
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={sameAsShipping}
-              onChange={(e) => setSameAsShipping(e.target.checked)}
-              inputProps={{ 'aria-label': 'Same as shipping address' }}
-            />
-          }
-          label="Same as shipping address"
-        />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.sameAsShipping}
+            onChange={(e) => setFormData({ ...formData, sameAsShipping: e.target.checked })}
+          />
+        }
+        label="Same as shipping address"
+      />
 
-        {/* Billing Address Section */}
-        <Box mt={4}>
-          <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend" id="billing-address-heading">
-              Billing Address
-            </FormLabel>
-
-            <Grid container spacing={2} aria-labelledby="billing-address-heading" role="group">
-              {[
-                ['First name', 'firstName'],
-                ['Last name', 'lastName'],
-                ['Address', 'address'],
-                ['Suite/Apt', 'suite'],
-                ['ZIP Code', 'zipCode'],
-                ['City', 'city'],
-                ['State', 'state'],
-                ['Country', 'country'],
-                ['Phone', 'phone'],
-                ['Email', 'email'],
-              ].map(([label, name]) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={name === 'firstName' || name === 'lastName' ? 6 : 12}
-                  key={name}
-                >
-                  <TextField
-                    fullWidth
-                    id={`billing-${name}`}
-                    name={name}
-                    label={label}
-                    value={(billingAddress as any)[name]}
-                    onChange={handleBillingAddressChange}
-                    inputProps={{
-                      'aria-label': label,
-                    }}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </FormControl>
-        </Box>
-
-        {/* Billing Info Section */}
-        <Box mt={4}>
-          <FormControl component="fieldset" fullWidth>
-            <FormLabel component="legend" id="billing-info-heading">
-              Billing Information
-            </FormLabel>
-
-            <Grid container spacing={2} aria-labelledby="billing-info-heading" role="group">
-              {[
-                ['First name', 'firstName'],
-                ['Last name', 'lastName'],
-                ['Card Number', 'cardNumber'],
-                ['Expiration (MM/YYYY)', 'expiration'],
-                ['CVV', 'cvv'],
-              ].map(([label, name]) => (
-                <Grid item xs={12} sm={name === 'cvv' ? 6 : 12} key={name}>
-                  <TextField
-                    fullWidth
-                    id={`billingInfo-${name}`}
-                    name={name}
-                    label={label}
-                    value={(billingInfo as any)[name]}
-                    onChange={handleBillingInfoChange}
-                    inputProps={{
-                      'aria-label': label,
-                      inputMode: name === 'cardNumber' || name === 'cvv' ? 'numeric' : 'text',
-                    }}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </FormControl>
-        </Box>
-
-        <Box mt={4}>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <TextField
+            label="First Name*"
+            fullWidth
+            value={formData.firstName}
+            onChange={handleChange('firstName')}
+            error={errors.firstName}
+            helperText={errors.firstName ? 'First name required' : ''}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Last Name*"
+            fullWidth
+            value={formData.lastName}
+            onChange={handleChange('lastName')}
+            error={errors.lastName}
+            helperText={errors.lastName ? 'Last name required' : ''}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Card number*"
+            fullWidth
+            value={formData.cardNumber}
+            onChange={handleChange('cardNumber')}
+            error={errors.cardNumber}
+            helperText={errors.cardNumber ? 'Enter a valid 16-digit card number' : ''}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Expiration date*"
+            fullWidth
+            value={formData.expiry}
+            onChange={handleChange('expiry')}
+            error={errors.expiry}
+            helperText={errors.expiry ? 'MM/YYYY' : ''}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="CVV*"
+            fullWidth
+            value={formData.cvv}
+            onChange={handleChange('cvv')}
+            error={errors.cvv}
+            helperText={errors.cvv ? '3-digit CVV' : ''}
+          />
+        </Grid>
+        <Grid item xs={12}>
           <Button
-            type="submit"
             variant="contained"
             color="primary"
-            aria-label="Complete Payment"
+            fullWidth
+            disabled={!isCompleteEnabled}
           >
-            Complete Payment
+            Complete
           </Button>
-        </Box>
-      </form>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
