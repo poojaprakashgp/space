@@ -373,3 +373,127 @@ if (name === "expirationDate") {
         .replace(/(\d{2})(\d{0,4})/, (match, p1, p2) => `${p1}${p2 ? "/" + p2 : ""}`);
     }
 
+
+
+
+// pages/index.tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import styles from "../styles/PaymentForm.module.scss";
+import InputField from "../components/InputField";
+import Checkbox from "../components/Checkbox";
+
+export default function PaymentForm() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    cardNumber: "",
+    expirationDate: "",
+    cvv: ""
+  });
+
+  const [isValid, setIsValid] = useState(false);
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+
+  useEffect(() => {
+    const cardNumberValid = /^\d{4} \d{4} \d{4} \d{4}$/.test(formData.cardNumber);
+    const expirationValid = /^(0[1-9]|1[0-2])\/(\d{4})$/.test(formData.expirationDate);
+    const cvvValid = /^\d{3}$/.test(formData.cvv);
+    const nameValid = formData.firstName.trim() !== "" && formData.lastName.trim() !== "";
+
+    setIsValid(cardNumberValid && expirationValid && cvvValid && nameValid);
+  }, [formData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let formattedValue = value;
+
+    if (name === "cardNumber") {
+      formattedValue = value.replace(/[^\d]/g, "").replace(/(.{4})/g, "$1 ").trim();
+    } else if (name === "expirationDate") {
+      formattedValue = value.replace(/[^\d]/g, "");
+      if (formattedValue.length >= 3) {
+        formattedValue = `${formattedValue.slice(0, 2)}/${formattedValue.slice(2, 6)}`;
+      }
+    }
+
+    setFormData({
+      ...formData,
+      [name]: formattedValue
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid) return;
+    alert("Payment information submitted!");
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.paymentForm}>
+      <h1>Payment</h1>
+
+      <Checkbox
+        checked={sameAsShipping}
+        onChange={setSameAsShipping}
+        strongLabel="Same as shipping address"
+      />
+
+      <div className={styles.row}>
+        <InputField
+          label="First Name"
+          name="firstName"
+          placeholder="First name"
+          required
+          value={formData.firstName}
+          onChange={handleChange}
+        />
+        <InputField
+          label="Last Name"
+          name="lastName"
+          placeholder="Last name"
+          required
+          value={formData.lastName}
+          onChange={handleChange}
+        />
+      </div>
+
+      <InputField
+        label="Card number"
+        name="cardNumber"
+        placeholder="1234 5678 9012 3456"
+        required
+        maxLength={19}
+        value={formData.cardNumber}
+        onChange={handleChange}
+      />
+
+      <div className={styles.row}>
+        <InputField
+          label="Expiration date"
+          name="expirationDate"
+          placeholder="MM/YYYY"
+          required
+          maxLength={7}
+          value={formData.expirationDate}
+          onChange={handleChange}
+        />
+        <InputField
+          label="CVV"
+          name="cvv"
+          placeholder="123"
+          required
+          maxLength={3}
+          value={formData.cvv}
+          onChange={handleChange}
+        />
+      </div>
+
+      <button type="submit" disabled={!isValid} className={styles.submitButton}>
+        Complete
+      </button>
+    </form>
+  );
+}
+
