@@ -528,3 +528,243 @@ const Checkbox: React.FC<CheckboxProps> = ({
 };
 
 export default Checkbox;
+
+
+
+
+
+
+ {
+                        "id": "payment",
+                        "title": "Payment",
+                        "content": {
+                          "section": [
+                            {
+                              "id": "completed_state",
+                              "body": "****XXXX",
+                              "cta": {
+                                "text": "Edit Payment",
+                                "type": "link",
+                                "action": "native"
+                              }
+                            },
+                            {
+                              "id": "incompleted_state",
+                              "content": {
+                                "section": [
+                                  {
+                                    "id": "same_as_shipping_address",
+                                    "title": "Same as shipping address",
+                                    "type": "checkbox"
+                                  },
+                                  {
+                                    "id": "billing_address_and_information",
+                                    "content": [
+                                      {
+                                        "id": "billing_address",
+                                        "content": {
+                                          "section": [
+                                            {
+                                              "id": "first_name",
+                                              "input": {
+                                                "label": "First Name*",
+                                                "placeholder": "First name",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter first name"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "last_name",
+                                              "input": {
+                                                "label": "Last Name*",
+                                                "placeholder": "Last name",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter last name"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "address",
+                                              "input": {
+                                                "label": "Address*",
+                                                "placeholder": "Address",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter address"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "address_2",
+                                              "input": {
+                                                "label": "Suite/Apt",
+                                                "placeholder": "Suite/Apt",
+                                                "required": false
+                                              }
+                                            },
+                                            {
+                                              "id": "zip_code",
+                                              "input": {
+                                                "label": "Zip code*",
+                                                "placeholder": "XXXXX",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "invalid": "Please enter a number that contains at least 5 digits.",
+                                                  "required": "Enter ZIP code"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "city",
+                                              "input": {
+                                                "label": "City*",
+                                                "placeholder": "City",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter city"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "state",
+                                              "dropdown": {
+                                                "label": "State*",
+                                                "placeholder": "Select",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter state"
+                                                },
+                                                "options": [
+                                                  {
+                                                    "name": "California",
+                                                    "value": "CA"
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            {
+                                              "id": "country",
+                                              "dropdown": {
+                                                "label": "Country*",
+                                                "placeholder": "Select",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter country"
+                                                },
+                                                "options": [
+                                                  {
+                                                    "name": "USA",
+                                                    "value": "USA"
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            {
+                                              "id": "phone_number",
+                                              "input": {
+                                                "label": "Phone number*",
+                                                "placeholder": "XXX-XXX-XXXX",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter phone number",
+                                                  "invalid": "Invalid format"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "email",
+                                              "input": {
+                                                "label": "Email*",
+                                                "placeholder": "email@email",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "invalid": "Enter a valid email",
+                                                  "required": "Enter email"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        "id": "billing_information",
+                                        "content": {
+                                          "section": [
+                                            {
+                                              "id": "first_name",
+                                              "input": {
+                                                "label": "First Name*",
+                                                "placeholder": "First name",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter first name"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "last_name",
+                                              "input": {
+                                                "label": "Last Name*",
+                                                "placeholder": "Last name",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter last name"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "card_number",
+                                              "input": {
+                                                "label": "Card number*",
+                                                "placeholder": "XXXX XXXX XXXX XXXX",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter card number",
+                                                  "invalid": "Enter valid card number"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "expiration_date",
+                                              "input": {
+                                                "label": "Expiration date*",
+                                                "placeholder": "MM/YYYY",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "required": "Enter expiration date",
+                                                  "invalid": "Enter valid expiration date"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "id": "cvv",
+                                              "input": {
+                                                "label": "CVV*",
+                                                "placeholder": "XXX",
+                                                "required": true,
+                                                "errorMessages": {
+                                                  "invalid": "Enter valid CVV",
+                                                  "required": "Enter CVV"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "cta": {
+                                "text": "Complete",
+                                "type": "button",
+                                "style": "primary",
+                                "action": "native"
+                              }
+                            }
+                          ]
+                        }
+                      },
