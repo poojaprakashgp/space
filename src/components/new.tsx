@@ -270,3 +270,53 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 };
 
 
+
+.payment-form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+
+  &__title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: #111;
+  }
+
+  &__input-wrapper {
+    margin-top: 1rem;
+  }
+
+  &__submit-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #ccc;
+    color: #777;
+    cursor: not-allowed;
+    transition: background 0.2s;
+
+    &.enabled {
+      background: #1a1c35;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: darken(#1a1c35, 10%);
+      }
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+}
+ className={`submit-btn ${isValid ? 'enabled' : ''}`}
+
