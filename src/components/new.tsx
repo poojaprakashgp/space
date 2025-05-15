@@ -119,3 +119,120 @@ export default function PaymentPage() {
     </form>
   );
 }
+
+
+.payment {
+  &__page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: #f5f5f5;
+    min-height: 100vh;
+  }
+
+  &__form {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 500px;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: #111;
+  }
+
+  &__checkbox {
+    font-size: 14px;
+    font-family: "GalanoGrotesque-Medium", sans-serif;
+
+    &-flex {
+      display: flex;
+      align-items: center;
+    }
+
+    &-group {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      width: 1rem;
+      height: 1rem;
+      display: grid;
+      margin-right: 8px;
+
+      input:checked {
+        background: #1a1c35;
+        border-color: #1a1c35;
+      }
+
+      svg {
+        stroke: #fff;
+        justify-self: center;
+        align-self: center;
+        width: 0.875rem;
+        height: 0.875rem;
+        grid-row-start: 1;
+        grid-column-start: 1;
+        pointer-events: none;
+        display: block;
+        vertical-align: middle;
+        overflow-clip-margin: content-box;
+        overflow: hidden;
+      }
+    }
+
+    &-input {
+      margin: 0;
+      background: #fff;
+      border: 1px solid #d1d5dc;
+      border-radius: 0.25rem;
+      appearance: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      grid-row-start: 1;
+      grid-column-start: 1;
+    }
+
+    &-bold {
+      font-weight: 700;
+      font-family: "GalanoGrotesque-Bold", sans-serif;
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__submit-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #ccc;
+    color: #777;
+    cursor: not-allowed;
+    transition: background 0.2s;
+
+    &--enabled {
+      background: #d32f2f;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: #a50000;
+      }
+    }
+  }
+
+  &__input-wrapper {
+    margin-top: 1rem;
+  }
+}
+
