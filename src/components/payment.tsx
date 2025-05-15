@@ -136,3 +136,154 @@ export default function PaymentForm() {
     </Box>
   );
 }
+
+
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+  Grid,
+} from '@mui/material';
+
+const PaymentForm: React.FC = () => {
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [cardNumber, setCardNumber] = useState<string>('');
+  const [expiry, setExpiry] = useState<string>('');
+  const [cvv, setCvv] = useState<string>('');
+  const [sameAsShipping, setSameAsShipping] = useState<boolean>(true);
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
+
+  useEffect(() => {
+    const cardNumberDigits = cardNumber.replace(/\s/g, '');
+    const expiryRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
+
+    const isValid =
+      firstName.trim().length > 0 &&
+      lastName.trim().length > 0 &&
+      /^\d{3}$/.test(cvv) &&
+      cardNumberDigits.length === 16 &&
+      expiryRegex.test(expiry);
+
+    setIsFormValid(isValid);
+  }, [firstName, lastName, cardNumber, expiry, cvv]);
+
+  const handleCardInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.slice(0, 16);
+    const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    setCardNumber(formatted);
+  };
+
+  const handleExpiryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    if (value.length >= 3) {
+      value = value.slice(0, 2) + '/' + value.slice(2);
+    }
+    setExpiry(value);
+  };
+
+  const handleSubmit = () => {
+    alert('Payment Submitted!');
+  };
+
+  return (
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: 'auto',
+        p: 4,
+        border: '1px solid #ccc',
+        borderRadius: 2,
+        mt: 4,
+        boxShadow: 2,
+      }}
+    >
+      <Typography variant="h5" fontWeight={600} gutterBottom>
+        Payment
+      </Typography>
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={sameAsShipping}
+            onChange={(e) => setSameAsShipping(e.target.checked)}
+          />
+        }
+        label="Same as shipping address"
+      />
+
+      <Grid container spacing={2} mt={1}>
+        <Grid item xs={6}>
+          <TextField
+            label="First name*"
+            fullWidth
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Last name*"
+            fullWidth
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Card number*"
+            fullWidth
+            value={cardNumber}
+            onChange={handleCardInput}
+            placeholder="1234 5678 9012 3456"
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Expiration date*"
+            fullWidth
+            value={expiry}
+            onChange={handleExpiryInput}
+            placeholder="MM/YYYY"
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="CVV*"
+            fullWidth
+            inputProps={{ maxLength: 3 }}
+            value={cvv}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+              setCvv(val);
+            }}
+            placeholder="123"
+          />
+        </Grid>
+      </Grid>
+
+      <Box mt={3}>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={!isFormValid}
+          onClick={handleSubmit}
+        >
+          Complete
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+export default PaymentForm;
+
