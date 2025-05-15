@@ -365,3 +365,11 @@ export default function PaymentForm() {
   }
 }
 
+
+if (name === "expirationDate") {
+      formattedValue = value
+        .replace(/[^\d]/g, "")
+        .slice(0, 6)
+        .replace(/(\d{2})(\d{0,4})/, (match, p1, p2) => `${p1}${p2 ? "/" + p2 : ""}`);
+    }
+
