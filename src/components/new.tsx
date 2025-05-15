@@ -236,3 +236,37 @@ export default function PaymentPage() {
   }
 }
 
+
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  let v = value;
+
+  switch (name) {
+    case 'firstName':
+    case 'lastName':
+      // Allow only letters, spaces, and limit to 50 chars
+      v = v.replace(/[^A-Za-z\s]/g, '').slice(0, 50);
+      break;
+
+    case 'cardNumber':
+      // Allow only digits, auto format to 1234 1234 1234 1234
+      v = v.replace(/\D/g, '').slice(0, 16);
+      v = v.replace(/(.{4})/g, '$1 ').trim();
+      break;
+
+    case 'expiryDate':
+      // Allow only MM/YYYY format
+      v = v.replace(/\D/g, '').slice(0, 6);
+      v = v.replace(/(\d{2})(\d{0,4})/, (_, m, y) => (y ? `${m}/${y}` : m));
+      break;
+
+    case 'cvv':
+      // Allow only 3 digits
+      v = v.replace(/\D/g, '').slice(0, 3);
+      break;
+  }
+
+  setFormData((f) => ({ ...f, [name]: v }));
+};
+
+
