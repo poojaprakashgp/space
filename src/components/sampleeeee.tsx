@@ -192,3 +192,61 @@ export default function PaymentPage() {
       }
     }
   }
+
+
+
+
+
+
+.checkbox_section{
+    font-size: 14px;
+    font-family: "GalanoGrotesque-Medium", sans-serif;
+   &__flex{
+        display: flex;
+        align-items: center;
+   }
+
+   &__checkbox-group{
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        width: 1rem;
+        height: 1rem;
+        display: grid;
+        margin-right: 8px;
+        input:checked {
+            background: #1A1C35;
+            border-color: #1A1C35;
+        }
+        svg{
+            stroke: #fff;
+            justify-self: center;
+            align-self: center;
+            width: 0.875rem;
+            height: 0.875rem;
+            grid-row-start: 1;
+            grid-column-start: 1;
+            pointer-events: none;
+            display: block;
+            vertical-align: middle;
+            overflow-clip-margin: content-box;
+            overflow: hidden;
+        }
+   }
+
+   &__checkbox-input{
+        margin: 0;
+        background: #fff;
+        border: 1px solid #d1d5dc;
+        border-radius: 0.25rem;
+        appearance: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        grid-row-start: 1;
+        grid-column-start: 1;
+        
+   }
+
+   &__font-bold{
+        font-weight: 700;
+        font-family: "GalanoGrotesque-Bold", sans-serif;
+   }
+}
