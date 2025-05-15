@@ -497,3 +497,212 @@ export default function PaymentForm() {
   );
 }
 
+
+
+
+"use client";
+
+import React, { useState, useEffect } from "react";
+import InputField from "./InputField";  // adjust path as needed
+import Checkbox from "./Checkbox";      // adjust path as needed
+import styles from "../styles/payment.module.scss";
+
+function formatCardNumber(value: string) {
+  const digits = value.replace(/\D/g, "");
+  const matched = digits.match(/.{1,4}/g);
+  return matched ? matched.join(" ") : digits;
+}
+
+function isValidCardNumber(value: string) {
+  const digits = value.replace(/\s/g, "");
+  return /^\d{16}$/.test(digits);
+}
+
+function isValidExpirationDate(value: string) {
+  // MM/YYYY format, valid months 01-12
+  return /^(0[1-9]|1[0-2])\/\d{4}$/.test(value);
+}
+
+function isValidCVV(value: string) {
+  return /^\d{3}$/.test(value);
+}
+
+export default function PaymentForm() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    cardNumber: "",
+    expirationDate: "",
+    cvv: "",
+  });
+
+  const [formErrors, setFormErrors] = useState({
+    firstName: "",
+    lastName: "",
+    cardNumber: "",
+    expirationDate: "",
+    cvv: "",
+  });
+
+  const [isValid, setIsValid] = useState(false);
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+
+  // Validate inputs and update error messages
+  useEffect(() => {
+    const errors = {
+      firstName: formData.firstName.trim() ? "" : "First name is required",
+      lastName: formData.lastName.trim() ? "" : "Last name is required",
+      cardNumber: isValidCardNumber(formData.cardNumber)
+        ? ""
+        : "Card number must be 16 digits",
+      expirationDate: isValidExpirationDate(formData.expirationDate)
+        ? ""
+        : "Expiration date must be MM/YYYY",
+      cvv: isValidCVV(formData.cvv) ? "" : "CVV must be 3 digits",
+    };
+    setFormErrors(errors);
+
+    // Form is valid only if no errors
+    const valid =
+      Object.values(errors).every((e) => e === "") &&
+      Object.values(formData).every((v) => v !== "");
+    setIsValid(valid);
+  }, [formData]);
+
+  // Handlers for inputs:
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === "cardNumber") {
+      setFormData((prev) => ({
+        ...prev,
+        cardNumber: formatCardNumber(value),
+      }));
+    } else if (name === "expirationDate") {
+      // Optionally you can add formatting here if needed
+      setFormData((prev) => ({
+        ...prev,
+        expirationDate: value,
+      }));
+    } else if (name === "cvv") {
+      // Allow only digits and max 3 chars
+      const onlyDigits = value.replace(/\D/g, "").slice(0, 3);
+      setFormData((prev) => ({
+        ...prev,
+        cvv: onlyDigits,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setSameAsShipping(checked);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid) return;
+
+    alert("Payment information submitted!");
+    // Here you can also handle actual submission logic
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.payment__form}>
+      <h1 className={styles.payment__title}>Payment</h1>
+
+      <Checkbox
+        label="Same as shipping address"
+        checked={sameAsShipping}
+        onChange={handleCheckboxChange}
+        className={styles.payment__checkbox}
+        strongLabel=""
+      />
+
+      <div className={styles.payment__row}>
+        <InputField
+          label="First Name"
+          placeholder="First name"
+          required
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleInputChange}
+          className={formErrors.firstName ? styles.inputError : ""}
+        />
+        <InputField
+          label="Last Name"
+          placeholder="Last name"
+          required
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleInputChange}
+          className={formErrors.lastName ? styles.inputError : ""}
+        />
+      </div>
+
+      <InputField
+        label="Card number"
+        placeholder="1234 1234 1234 1234"
+        required
+        name="cardNumber"
+        value={formData.cardNumber}
+        onChange={handleInputChange}
+        maxLength={19}
+        className={formErrors.cardNumber ? styles.inputError : ""}
+      />
+      {formErrors.cardNumber && (
+        <div className={styles.errorMessage}>{formErrors.cardNumber}</div>
+      )}
+
+      <div className={styles.payment__row}>
+        <InputField
+          label="Expiration date"
+          placeholder="MM/YYYY"
+          required
+          name="expirationDate"
+          value={formData.expirationDate}
+          onChange={handleInputChange}
+          maxLength={7}
+          className={formErrors.expirationDate ? styles.inputError : ""}
+        />
+        {formErrors.expirationDate && (
+          <div className={styles.errorMessage}>
+            {formErrors.expirationDate}
+          </div>
+        )}
+
+        <InputField
+          label="CVV"
+          placeholder="123"
+          required
+          name="cvv"
+          value={formData.cvv}
+          onChange={handleInputChange}
+          maxLength={3}
+          className={formErrors.cvv ? styles.inputError : ""}
+        />
+        {formErrors.cvv && (
+          <div className={styles.errorMessage}>{formErrors.cvv}</div>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={!isValid}
+        className={`${styles.payment__submitBtn} ${
+          isValid ? styles["payment__submitBtn--enabled"] : ""
+        }`}
+      >
+        Complete
+      </button>
+    </form>
+  );
+}
+
+
