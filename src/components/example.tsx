@@ -190,3 +190,161 @@ input:focus {
   cursor: not-allowed;
 }
 
+
+
+
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export default function PaymentForm() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: ''
+  });
+
+  const [isValid, setIsValid] = useState(false);
+
+  const validateForm = () => {
+    const { firstName, lastName, cardNumber, expiry, cvv } = formData;
+    const cardPattern = /^\d{4} \d{4} \d{4} \d{4}$/;
+    const expiryPattern = /^(0[1-9]|1[0-2])\/(\d{4})$/;
+    const cvvPattern = /^\d{3}$/;
+
+    return (
+      firstName.trim() !== '' &&
+      lastName.trim() !== '' &&
+      cardPattern.test(cardNumber) &&
+      expiryPattern.test(expiry) &&
+      cvvPattern.test(cvv)
+    );
+  };
+
+  useEffect(() => {
+    setIsValid(validateForm());
+  }, [formData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    let val = value;
+
+    if (name === 'cardNumber') {
+      val = val.replace(/[^\d]/g, '').replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    if (name === 'cvv') {
+      val = val.replace(/[^\d]/g, '').slice(0, 3);
+    }
+
+    if (name === 'expiry') {
+      val = val.replace(/[^\d]/g, '').slice(0, 6);
+      if (val.length >= 3) {
+        val = val.slice(0, 2) + '/' + val.slice(2);
+      }
+    }
+
+    setFormData({ ...formData, [name]: val });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isValid) {
+      alert('Payment submitted!');
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-xl rounded-xl bg-white p-8 shadow-md"
+      >
+        <h2 className="mb-6 text-2xl font-bold">Payment</h2>
+        <div className="mb-4 flex items-center">
+          <input
+            type="checkbox"
+            id="sameAddress"
+            checked
+            readOnly
+            className="mr-2"
+          />
+          <label htmlFor="sameAddress" className="text-sm font-medium">
+            Same as shipping address
+          </label>
+        </div>
+        <div className="mb-4 grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1">First Name*</label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              placeholder="First name"
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Last Name*</label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="Last name"
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-blue-500"
+            />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Card number*</label>
+          <input
+            type="text"
+            name="cardNumber"
+            value={formData.cardNumber}
+            onChange={handleChange}
+            placeholder="1234 1234 1234 1234"
+            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-blue-500"
+          />
+        </div>
+        <div className="mb-6 grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Expiration date*</label>
+            <input
+              type="text"
+              name="expiry"
+              value={formData.expiry}
+              onChange={handleChange}
+              placeholder="MM/YYYY"
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">CVV*</label>
+            <input
+              type="text"
+              name="cvv"
+              value={formData.cvv}
+              onChange={handleChange}
+              placeholder="123"
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-blue-500"
+            />
+          </div>
+        </div>
+        <button
+          type="submit"
+          disabled={!isValid}
+          className={`w-full rounded bg-red-600 px-4 py-2 text-white font-semibold transition-opacity ${
+            isValid ? 'opacity-100 hover:bg-red-700' : 'opacity-50 cursor-not-allowed'
+          }`}
+        >
+          Complete
+        </button>
+      </form>
+    </div>
+  );
+}
+
