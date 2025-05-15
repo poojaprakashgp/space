@@ -348,3 +348,136 @@ export default function PaymentForm() {
   );
 }
 
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import InputField from '@/components/InputField';
+
+const PaymentPage = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+  });
+
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    const { firstName, lastName, cardNumber, expiryDate, cvv } = formData;
+    const isValid =
+      firstName.trim() !== '' &&
+      lastName.trim() !== '' &&
+      /^\d{4} \d{4} \d{4} \d{4}$/.test(cardNumber) &&
+      /^(0[1-9]|1[0-2])\/\d{4}$/.test(expiryDate) &&
+      /^\d{3}$/.test(cvv);
+    setIsFormValid(isValid);
+  }, [formData]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    let updatedValue = value;
+
+    if (name === 'cardNumber') {
+      updatedValue = value
+        .replace(/\D/g, '')
+        .slice(0, 16)
+        .replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+
+    if (name === 'cvv') {
+      updatedValue = value.replace(/\D/g, '').slice(0, 3);
+    }
+
+    if (name === 'expiryDate') {
+      updatedValue = value
+        .replace(/[^\d/]/g, '')
+        .replace(/^([2-9])$/g, '0$1') // single month to 0x
+        .replace(/^(1[3-9])$/g, '01') // invalid months
+        .replace(/^(\d{2})(\d{1,4})?$/, (_: any, p1: string, p2: string) =>
+          p2 ? `${p1}/${p2}` : p1
+        )
+        .slice(0, 7);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: updatedValue,
+    }));
+  };
+
+  return (
+    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+      <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-bold mb-4">Payment</h2>
+        <div className="flex items-center mb-4">
+          <input
+            type="checkbox"
+            defaultChecked
+            className="mr-2 w-4 h-4 accent-black"
+          />
+          <span className="text-sm font-medium">Same as shipping address</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="First Name"
+            placeholder="First name"
+            required
+            name="firstName"
+            onChange={handleInputChange}
+          />
+          <InputField
+            label="Last Name"
+            placeholder="Last name"
+            required
+            name="lastName"
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="mt-4">
+          <InputField
+            label="Card number"
+            placeholder="1234 1234 1234 1234"
+            required
+            name="cardNumber"
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <InputField
+            label="Expiration date"
+            placeholder="MM/YYYY"
+            required
+            name="expiryDate"
+            onChange={handleInputChange}
+          />
+          <InputField
+            label="CVV"
+            placeholder="123"
+            required
+            name="cvv"
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <button
+          className={`mt-6 px-6 py-2 rounded w-full text-white font-semibold ${
+            isFormValid ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
+          }`}
+          disabled={!isFormValid}
+        >
+          Complete
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default PaymentPage;
+
