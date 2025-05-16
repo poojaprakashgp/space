@@ -767,3 +767,249 @@ export default function PaymentForm() {
 }
 
 
+.payment {
+  &__page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: #f5f5f5;
+    min-height: 100vh;
+  }
+
+  &__form {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 480px;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: #111;
+    font-weight: 700;
+  }
+
+  &__checkbox-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__input-wrapper {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1.5px solid #e2e2e2;
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        border-color: #ff5c5c;
+        outline: none;
+      }
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 16px;
+  }
+
+  &__input--small {
+    flex: 1;
+  }
+
+  &__input-wrapper:not(.payment__input--small) {
+    flex: 2;
+  }
+
+  &__submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #ddd;
+    color: #777;
+    cursor: not-allowed;
+    transition: background 0.2s;
+
+    &--enabled {
+      background: #ff5c5c;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: #e04a4a;
+      }
+    }
+  }
+}
+
+
+import React, { useState, useEffect } from 'react';
+import InputField from './InputField';
+import Checkbox from './Checkbox';
+import './payment.scss';
+
+const PaymentForm: React.FC = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    sameAsShipping: true,
+  });
+
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, sameAsShipping: checked }));
+  };
+
+  const validateCardNumber = (value: string) => {
+    const digitsOnly = value.replace(/\s/g, '');
+    return /^\d{16}$/.test(digitsOnly);
+  };
+
+  const validateForm = () => {
+    return (
+      formData.firstName.trim() !== '' &&
+      formData.lastName.trim() !== '' &&
+      validateCardNumber(formData.cardNumber) &&
+      /^\d{2}\/\d{4}$/.test(formData.expiryDate) &&
+      /^\d{3}$/.test(formData.cvv)
+    );
+  };
+
+  useEffect(() => {
+    setIsFormValid(validateForm());
+  }, [formData]);
+
+  const formatCardNumber = (value: string) =>
+    value
+      .replace(/\D/g, '')
+      .slice(0, 16)
+      .replace(/(.{4})/g, '$1 ')
+      .trim();
+
+  return (
+    <div className="payment__page">
+      <form className="payment__form" aria-labelledby="payment-title">
+        <h2 id="payment-title" className="payment__title">Payment</h2>
+
+        <Checkbox
+          checked={formData.sameAsShipping}
+          onChange={handleCheckboxChange}
+          strongLabel="Same as shipping address"
+          className="payment__checkbox-flex"
+        />
+
+        <div className="payment__row">
+          <div className="payment__input-wrapper payment__input--small">
+            <InputField
+              label="First Name"
+              placeholder="First name"
+              required
+              name="firstName"
+              onChange={handleChange}
+              value={formData.firstName}
+              aria-required="true"
+            />
+          </div>
+          <div className="payment__input-wrapper">
+            <InputField
+              label="Last name"
+              placeholder="Last name"
+              required
+              name="lastName"
+              onChange={handleChange}
+              value={formData.lastName}
+              aria-required="true"
+            />
+          </div>
+        </div>
+
+        <div className="payment__input-wrapper">
+          <InputField
+            label="Card number"
+            placeholder="1234 1234 1234 1234"
+            required
+            name="cardNumber"
+            value={formData.cardNumber}
+            onChange={(e) =>
+              handleChange({
+                ...e,
+                target: {
+                  ...e.target,
+                  value: formatCardNumber(e.target.value),
+                },
+              })
+            }
+            aria-required="true"
+          />
+        </div>
+
+        <div className="payment__row">
+          <div className="payment__input-wrapper">
+            <InputField
+              label="Expiration date"
+              placeholder="MM/YYYY"
+              required
+              name="expiryDate"
+              value={formData.expiryDate}
+              onChange={handleChange}
+              aria-required="true"
+            />
+          </div>
+          <div className="payment__input-wrapper payment__input--small">
+            <InputField
+              label="CVV"
+              placeholder="123"
+              required
+              name="cvv"
+              value={formData.cvv}
+              onChange={handleChange}
+              aria-required="true"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className={`payment__submit-btn ${isFormValid ? 'payment__submit-btn--enabled' : ''}`}
+          disabled={!isFormValid}
+        >
+          Complete
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default PaymentForm;
+
+
