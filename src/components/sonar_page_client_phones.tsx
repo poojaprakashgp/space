@@ -2077,3 +2077,93 @@ export default function ProductsList() {
 	"endLineNumber": 1727,
 	"endColumn": 30
 }]
+
+
+
+
+const applyFilterUpdates = async (filterUpdates: FilterState, source: string) => {
+  setActiveFilters((prev) => ({ ...prev, ...filterUpdates }));
+  let filtered = [...plpData.products];
+  let chips: string[] = [];
+
+  if (filterUpdates.brand?.length) {
+    filtered = filterByBrand(filtered, filterUpdates.brand);
+    chips.push(...getBrandChips(filterUpdates.brand));
+  }
+
+  if (filterUpdates.phoneType?.length) {
+    filtered = filterByPhoneType(filtered, filterUpdates.phoneType);
+    chips.push(...getPhoneTypeChips(filterUpdates.phoneType));
+  }
+
+  if (filterUpdates.priceRange) {
+    const { min, max } = filterUpdates.priceRange;
+    if (!isDefaultFilter('price', { min, max })) {
+      filtered = filterByPrice(filtered, min, max);
+      chips.push(getPriceChip(min, max));
+    }
+  }
+
+  if (filterUpdates.inStock !== undefined && !isDefaultFilter('availability', filterUpdates.inStock)) {
+    chips.push(getAvailabilityChip(filterUpdates.inStock));
+  }
+
+  if (filterUpdates.ampleStorage?.length) {
+    filtered = filtered.filter((p) => phoneProductData[p.productId].ampleStorage);
+  }
+
+  if (filterUpdates.largeScreen?.length) {
+    filtered = filtered.filter((p) => phoneProductData[p.productId].largeScreen);
+  }
+
+  setPhoneList(filtered);
+
+  if (source.includes('chat-intent') || source.includes('command-dispatcher')) {
+    setFilters(chips);
+    syncToSessionStorage(chips);
+  } else {
+    mergeWithExistingFilters(chips);
+  }
+};
+
+function filterByPrice(phones: Phone[], min: number, max: number): Phone[] {
+  return phones.filter((phone) => {
+    const price = phone.content.section?.find((item) => !!item.price)?.price?.fullPrice ?? '0';
+    const numericPrice = extractPrice(price);
+    return numericPrice >= min && numericPrice <= max;
+  });
+}
+
+function filterByPhoneType(phones: Phone[], phoneTypes: string[]): Phone[] {
+  const typeFilters = phoneTypes.map((type) => type.split(' ')[0].toLowerCase());
+
+  return phones.filter((phone) => {
+    const title = phone.content.section?.find((item) => !!item.title)?.title?.toLowerCase();
+    if (!title) return false;
+
+    return typeFilters.some((type) => {
+      if (type === 'apple') return /(iphone|ipad|macbook)/.test(title);
+      if (type === 'android') return /(moto|motorola|pixel|google|galaxy|samsung)/.test(title);
+      if (type === 'basic') return title.includes('tcl flip');
+      return false;
+    });
+  });
+}
+
+function filterByBrand(phones: Phone[], brands: string[]): Phone[] {
+  const brandFilters = brands.map((b) => b.toLowerCase());
+
+  return phones.filter((phone) => {
+    const title = phone.content.section?.find((item) => !!item.title)?.title?.toLowerCase();
+    if (!title) return false;
+
+    return brandFilters.some((brand) => {
+      if (brand === 'apple') return /(iphone|ipad|macbook)/.test(title);
+      if (brand === 'samsung') return /(galaxy|samsung)/.test(title);
+      if (brand === 'google') return /(pixel|google)/.test(title);
+      if (brand === 'motorola') return /(moto|motorola)/.test(title);
+      return title.includes(brand);
+    });
+  });
+}
+
