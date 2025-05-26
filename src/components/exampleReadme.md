@@ -8,3 +8,18 @@ API : https://sit1.totalwireless.com/nsa/api/shop/v1/agentic/llmsummary
 Are commas (seperators) required for multiple options on chat windows? 
 As of now, we are using "and" instead of (,)
 Example- Samsung,Iphone,TCL,Motorola
+
+
+
+x-frame-options
+x-xss-protection
+
+Content-Security-Policy
+
+Access-Control-Allow-Origin
+
+Cache-Control
+
+referrer-policy
+
+strict-transport-security
