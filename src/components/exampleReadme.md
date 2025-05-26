@@ -23,3 +23,6 @@ Cache-Control
 referrer-policy
 
 strict-transport-security
+
+
+5-pending, 10-progress, 2-retest, 2-review
