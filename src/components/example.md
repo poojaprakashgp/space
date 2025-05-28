@@ -13,3 +13,4 @@ Once click on order confirmation we need show response in addition to agentic re
 
  Once click on order confirmation we need show response in addition to agentic response the below message
  
+https://verizon.webex.com/wbxmjs/joinservice/sites/verizon/meeting/download/8fce25014e834a2a8be92d98c3524c05?siteurl=verizon&MTID=m7aae3025fdb2f88cc8fad7e235ed9430
