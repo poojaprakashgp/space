@@ -9,5 +9,7 @@ To track your order status, manage your plan, or explore more features, please l
 Pinkoo Lamba 2
 Your order has been successfully placed. We're getting everything ready for you.  To track your order status, manage your plan, or explore more features, please log in to your account.
 Once click on order confirmation we need show response in addition to agentic response the below message
- 
+
+
+ Once click on order confirmation we need show response in addition to agentic response the below message
  
