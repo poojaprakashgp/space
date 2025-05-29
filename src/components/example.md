@@ -14,3 +14,23 @@ Once click on order confirmation we need show response in addition to agentic re
  Once click on order confirmation we need show response in addition to agentic response the below message
  
 https://verizon.webex.com/wbxmjs/joinservice/sites/verizon/meeting/download/8fce25014e834a2a8be92d98c3524c05?siteurl=verizon&MTID=m7aae3025fdb2f88cc8fad7e235ed9430
+
+
+
+Request to Prioritize Investigation of Defect
+
+Hi [Offshore Team Member's Name],
+
+I hope you're doing well.
+
+Could you please look into the following defect as a priority? It’s currently impacting [briefly mention the impact – e.g., a key user flow, a production system, etc.], and we need to identify the root cause and resolution as soon as possible.
+
+Defect Details:
+
+Summary: [Brief summary of the defect]
+Steps to Reproduce: [If available, include clear steps]
+Environment: [e.g., UAT, Production]
+Ticket/Reference ID: [JIRA/ServiceNow/etc.]
+Please provide an update once you've had a chance to investigate or if any additional information is required.
+
+Thanks for your prompt attention to this.
