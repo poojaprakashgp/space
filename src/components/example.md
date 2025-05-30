@@ -23,6 +23,13 @@ Hi [Offshore Team Member's Name],
 
 I hope you're doing well.
 
+
+
+
+
+Error: Hydration failed because the initial UI does not match what was rendered on the server.
+See more info here: https://nextjs.org/docs/messages/react-hydration-error
+
 Could you please look into the following defect as a priority? It’s currently impacting [briefly mention the impact – e.g., a key user flow, a production system, etc.], and we need to identify the root cause and resolution as soon as possible.
 
 Defect Details:
