@@ -62,3 +62,12 @@ export default function ReloadOnly() {
   return <div>Page</div>;
 }
 
+useEffect(() => {
+  const navType = performance.getEntriesByType('navigation')[0]?.type;
+
+  if (navType === 'reload') {
+    console.log('User reloaded the page');
+  } else {
+    console.log('Page loaded normally');
+  }
+}, []);
