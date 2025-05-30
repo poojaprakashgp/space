@@ -41,3 +41,24 @@ Ticket/Reference ID: [JIRA/ServiceNow/etc.]
 Please provide an update once you've had a chance to investigate or if any additional information is required.
 
 Thanks for your prompt attention to this.
+
+
+
+'use client';
+
+import { useEffect } from 'react';
+
+export default function ReloadOnly() {
+  useEffect(() => {
+    const navEntries = performance.getEntriesByType('navigation');
+    const navType = navEntries?.[0]?.type;
+
+    if (navType === 'reload') {
+      console.log('User reloaded the page');
+      // You can trigger your logic here
+    }
+  }, []);
+
+  return <div>Page</div>;
+}
+
