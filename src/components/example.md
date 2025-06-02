@@ -71,3 +71,12 @@ useEffect(() => {
     console.log('Page loaded normally');
   }
 }, []);
+
+
+    font-size: 0.875rem;
+    font-weight: bold;
+    border-radius: 9999px;
+    width: 160px;
+    height: 40px;
+    /* place-items: center; */
+    min-width: 160px;
