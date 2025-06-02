@@ -146,3 +146,12 @@ export const Button = ({
 
 export default Button;
 
+.custom-hover {
+  transition: background-color 0.2s ease;
+}
+.custom-hover:hover {
+  background-color: darkgreen;
+  color: white;
+}
+
+
