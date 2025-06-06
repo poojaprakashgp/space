@@ -311,3 +311,51 @@ export default AllFilters;
 .no-scroll{
   overflow: hidden;
 }
+
+
+
+
+
+.filters-list {
+  position: fixed; // <-- Key to keep it in viewport
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; // Occupy full viewport
+  z-index: 1000;
+  background-color: #eeeef7;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; // Allow internal scroll
+  transition: transform 0.3s ease;
+  transform: translateY(100%);
+  
+  &.expanded {
+    transform: translateY(0); // Slide in
+  }
+
+  &.collapsed {
+    transform: translateY(100%); // Slide out
+  }
+
+  &__filter-list {
+    flex: 1; // Take up available space
+    overflow-y: auto;
+    padding: var(--vds-space-8x);
+  }
+
+  .filter-list {
+    flex-wrap: wrap;
+    overflow: auto;
+  }
+
+  &__filter-btns {
+    padding-bottom: var(--vds-space-8x); // Ensure buttons visible
+  }
+}
+
+
+.app--filters-open {
+  overflow: hidden;
+  height: 100vh;
+}
