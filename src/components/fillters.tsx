@@ -220,8 +220,7 @@ export default AllFilters;
 
 
 
-
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Checkbox from '@vds/core/checkboxes/checkbox';
 import TextLinkButton from '@vds/core/buttons/text-link';
 import VDSButton from '@vds/core/buttons/button/';
@@ -240,48 +239,17 @@ const AllFilters = ({
 }: AllFiltersProps) => {
   const { section } = content || {};
   const [checkboxData, setCheckboxData] = useState(section);
-  const [maxHeight, setMaxHeight] = useState(600);
-  const filtersRef = useRef<HTMLDivElement>(null);
 
-  // Disable/Enable body scroll based on dropdown visibility
+  // Toggle body scroll class
   useEffect(() => {
     if (showAllFilters) {
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('no-scroll');
     } else {
-      document.body.style.overflow = '';
+      document.body.classList.remove('no-scroll');
     }
 
     return () => {
-      document.body.style.overflow = '';
-    };
-  }, [showAllFilters]);
-
-  // Throttled max-height update
-  useEffect(() => {
-    let timeout: number;
-
-    const updateMaxHeight = () => {
-      if (filtersRef.current) {
-        const rect = filtersRef.current.getBoundingClientRect();
-        const availableSpace = window.innerHeight - rect.top - 20;
-        const newHeight = Math.min(600, availableSpace);
-        setMaxHeight((prev) => (prev !== newHeight ? newHeight : prev));
-      }
-    };
-
-    const throttledResize = () => {
-      clearTimeout(timeout);
-      timeout = window.setTimeout(updateMaxHeight, 100);
-    };
-
-    if (showAllFilters) {
-      updateMaxHeight();
-      window.addEventListener('resize', throttledResize);
-    }
-
-    return () => {
-      clearTimeout(timeout);
-      window.removeEventListener('resize', throttledResize);
+      document.body.classList.remove('no-scroll');
     };
   }, [showAllFilters]);
 
@@ -293,23 +261,24 @@ const AllFilters = ({
   const handleCheckboxChange = useCallback(
     (category: string, optionId: string, checked: boolean) => {
       setCheckboxData((prevData) =>
-        prevData?.map((section) => {
-          if (section.id === category) {
-            const updatedOptions = (section.options ?? []).map((option) =>
-              option.id === optionId ? { ...option, selected: checked } : option
-            );
-            return { ...section, options: updatedOptions };
-          }
-          return section;
-        })
+        prevData?.map((section) =>
+          section.id === category
+            ? {
+                ...section,
+                options: section.options?.map((opt) =>
+                  opt.id === optionId ? { ...opt, selected: checked } : opt
+                ),
+              }
+            : section
+        )
       );
     },
     []
   );
 
   useEffect(() => {
-    const selected = checkboxData?.flatMap((section) =>
-      section?.options?.filter((option) => option.selected) ?? []
+    const selected = checkboxData?.flatMap(
+      (section) => section?.options?.filter((option) => option.selected) ?? []
     );
     handleSelectedAllFiltersChange(selected ?? []);
   }, [checkboxData, handleSelectedAllFiltersChange]);
@@ -317,8 +286,9 @@ const AllFilters = ({
   useEffect(() => {
     if (!filters || !checkboxData) return;
     setCheckboxData((prevData) =>
-      prevData?.map((section) => {
-        const updatedOptions = (section.options ?? []).map((option) => {
+      prevData?.map((section) => ({
+        ...section,
+        options: section.options?.map((option) => {
           let isInFilters = filters.includes(option.title);
           if (
             (filters.includes('Under $300') &&
@@ -330,13 +300,9 @@ const AllFilters = ({
           ) {
             isInFilters = true;
           }
-          return {
-            ...option,
-            selected: isInFilters,
-          };
-        });
-        return { ...section, options: updatedOptions };
-      })
+          return { ...option, selected: isInFilters };
+        }),
+      }))
     );
   }, [filters]);
 
@@ -353,6 +319,7 @@ const AllFilters = ({
         <div className='filter-list__filters'>
           {options.map((option: Options) => {
             const { id, title, value, selected } = option;
+
             return (
               <div key={id} className='filter-list__filter'>
                 <Checkbox
@@ -381,11 +348,15 @@ const AllFilters = ({
     const isAnyCheckboxSelected = checkboxData?.some((section) =>
       section.options?.some((option) => option.selected)
     );
-
     switch (cta.id) {
       case 'clear all':
         return (
-          <TextLinkButton key={cta.id} onClick={resetCheckboxData}>
+          <TextLinkButton
+            key={cta.id}
+            onClick={() => {
+              resetCheckboxData();
+            }}
+          >
             {cta.text}
           </TextLinkButton>
         );
@@ -396,7 +367,9 @@ const AllFilters = ({
             key={cta.id}
             size='large'
             disabled={phoneListLen < 1 || !isAnyCheckboxSelected}
-            onClick={handleApplyFilters}
+            onClick={() => {
+              handleApplyFilters();
+            }}
           >
             {cta.text.replace('<<<totalOptions>>>', `${phoneListLen} options`)}
           </VDSButton>
@@ -409,17 +382,17 @@ const AllFilters = ({
 
   return (
     <div
-      ref={filtersRef}
       className={`filters-list ${!showAllFilters ? 'collapsed' : ''}`}
       style={{
-        maxHeight: showAllFilters ? `${maxHeight}px` : undefined,
-        overflowY: showAllFilters ? 'auto' : undefined,
+        maxHeight: showAllFilters ? 'calc(100vh - 100px)' : undefined,
+        overflowY: 'auto',
       }}
     >
       <div className='filters-list__filter-list'>
         <div className='filter-list'>
           {checkboxData?.map((category) => renderCategory(category))}
         </div>
+
         <div className='filters-list__filter-btns'>
           {ctas?.map((cta) => renderCTAButton(cta))}
         </div>
@@ -431,18 +404,27 @@ const AllFilters = ({
 export default AllFilters;
 
 
+.no-scroll {
+  overflow: hidden;
+}
+
 .filters-list {
   position: fixed;
   top: 0;
   right: 0;
-  bottom: 0;
-  width: 400px;
+  width: 100%;
+  max-width: 600px;
   background: white;
   z-index: 1000;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
 }
 
 .filters-list.collapsed {
   display: none;
 }
 
+.filters-list__filter-list {
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+  padding: 1rem;
+}
