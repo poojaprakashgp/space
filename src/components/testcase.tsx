@@ -79,3 +79,12 @@ describe('DevicePrice Component', () => {
   });
 });
 
+DevicePrice > renders title and falls back to fullPrice if discountedPrice is empty
+-----
+Error: Unable to find an element with the text: ₹60,000. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.Jest
+(method) matchers.TestingLibraryMatchers<any, void>.toBeInTheDocument(): void
+@description — Assert whether an element is present in the document or not.
+
+@example
+
+<svg data-testid="svg-element"></svg>
