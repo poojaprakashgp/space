@@ -191,5 +191,7 @@ describe('Preorder Component', () => {
     expect(priceEl?.textContent).toBe('');
   });
 
+ jest --coverage --collectCoverageFrom="src/components/DevicePrice.tsx"
+
  npm run test -- --coverage src/components/__tests__/DevicePrice.test.tsx
 
