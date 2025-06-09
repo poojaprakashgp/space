@@ -104,3 +104,24 @@ The detailed error message is suppressed by waitFor
 The detailed error message is suppressed by waitFor
 
 The detailed error message is suppressed by waitFor
+
+
+
+ import React from 'react';
+ 
+export const Preorder = ({ title = "", body = "" }) => {
+  return (
+    <div className="plan-desc-preorder-wrapper">
+      {title && (
+        <p>
+          {title}
+        </p>
+      )}
+      {body && (
+        <p>
+          {body}
+        </p>
+      )}
+    </div>
+  );
+};
