@@ -179,3 +179,14 @@ describe('Preorder Component', () => {
     expect(container.querySelector('p')).toBeNull();
   });
 });
+
+
+  it('uses default price prop when not provided', () => {
+    const { container } = render(
+      // @ts-expect-error - intentionally omitting `price` to trigger default
+      <DevicePrice title="Default Device" />
+    );
+    expect(screen.getByText('Default Device')).toBeInTheDocument();
+    const priceEl = container.querySelector('.font-light');
+    expect(priceEl?.textContent).toBe('');
+  });
