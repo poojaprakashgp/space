@@ -195,3 +195,15 @@ describe('Preorder Component', () => {
 
  npm run test -- --coverage src/components/__tests__/DevicePrice.test.tsx
 
+
+ import React from 'react';
+
+export const OutOfStock = ({ title }: { title: string }) => {
+  return (
+    <div className="phone-recommendation__out-of-stock">
+      <span className="phone-recommendation__out-of-stock--text">{title}</span>
+    </div>
+  );
+};
+
+
