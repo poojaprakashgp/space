@@ -206,4 +206,15 @@ export const OutOfStock = ({ title }: { title: string }) => {
   );
 };
 
+ import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { OutOfStock } from './OutOfStock';
+
+describe('OutOfStock', () => {
+  it('renders the out-of-stock title', () => {
+    render(<OutOfStock title="Currently Unavailable" />);
+    expect(screen.getByText('Currently Unavailable')).toBeInTheDocument();
+  });
+});
+
 
