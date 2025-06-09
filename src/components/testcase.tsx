@@ -88,3 +88,19 @@ Error: Unable to find an element with the text: ₹60,000. This could be because
 @example
 
 <svg data-testid="svg-element"></svg>
+
+
+
+ DevicePrice > renders title and empty price when both are empty
+-----
+Error: Found multiple elements with the text: 
+
+Here are the matching elements:
+
+The detailed error message is suppressed by waitFor
+
+The detailed error message is suppressed by waitFor
+
+The detailed error message is suppressed by waitFor
+
+The detailed error message is suppressed by waitFor
