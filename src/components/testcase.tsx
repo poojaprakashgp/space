@@ -190,3 +190,6 @@ describe('Preorder Component', () => {
     const priceEl = container.querySelector('.font-light');
     expect(priceEl?.textContent).toBe('');
   });
+
+ npm run test -- --coverage src/components/__tests__/DevicePrice.test.tsx
+
