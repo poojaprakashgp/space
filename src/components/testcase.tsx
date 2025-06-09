@@ -125,3 +125,27 @@ export const Preorder = ({ title = "", body = "" }) => {
     </div>
   );
 };
+
+
+  it('renders both title and body when provided', () => {
+    render(<Preorder title="Preorder Now" body="Ships in 2 weeks" />);
+    expect(screen.getByText('Preorder Now')).toBeInTheDocument();
+    expect(screen.getByText('Ships in 2 weeks')).toBeInTheDocument();
+  });
+
+  it('renders only title when body is empty', () => {
+    render(<Preorder title="Coming Soon" body="" />);
+    expect(screen.getByText('Coming Soon')).toBeInTheDocument();
+    expect(screen.queryByText('Ships in 2 weeks')).not.toBeInTheDocument();
+  });
+
+  it('renders only body when title is empty', () => {
+    render(<Preorder title="" body="Launching next month" />);
+    expect(screen.queryByText('Coming Soon')).not.toBeInTheDocument();
+    expect(screen.getByText('Launching next month')).toBeInTheDocument();
+  });
+
+  it('renders nothing when both title and body are empty', () => {
+    const { container } = render(<Preorder title="" body="" />);
+    expect(container.querySelector('p')).toBeNull();
+  });
