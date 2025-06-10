@@ -218,3 +218,5 @@ describe('OutOfStock', () => {
 });
 
 
+ The iPhone 15 has several improvements over the iPhone 14. The iPhone 15 features Dynamic Island, a 48MP Main camera, and an A16 Bionic Chip. The iPhone 15's Super Retina XDR display is also brighter. Here's a comparison: * **Display:** iPhone 15's display is up to 2x brighter in the sun compared to iPhone 14. * **Camera:** iPhone 15 has a 48MP Main camera. * **Chip:** iPhone 15 uses the A16 Bionic Chip. * **Features:** iPhone 15 has Dynamic Island.
+
