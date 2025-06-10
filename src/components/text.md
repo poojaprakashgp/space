@@ -7,3 +7,13 @@ We then remove the flag after confirming it, so that on subsequent reloads it do
  
 If navigatedViaApp is not set or false:
 We treat it as an unauthorized access or a page reload, and redirect the user to the /phones page.
+
+
+
+ const navigatedViaApp = sessionStorage.getItem('navigatedViaApp') === 'true';
+    if(navigatedViaApp) {
+      sessionStorage.removeItem('navigatedViaApp');
+    } else E{
+      router.push(`${getBaseURL()}/phones`);
+    }
+ 
