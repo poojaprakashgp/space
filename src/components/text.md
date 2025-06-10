@@ -17,3 +17,12 @@ We treat it as an unauthorized access or a page reload, and redirect the user to
       router.push(`${getBaseURL()}/phones`);
     }
  
+it('should redirect to /phones if navigatedViaApp is not true', () => {
+    sessionStorage.removeItem('navigatedViaApp'); // ensure it's gone
+    const removeItemSpy = jest.spyOn(sessionStorage, 'removeItem');
+
+    yourFunctionOrComponent(); // this must run the logic
+
+    expect(removeItemSpy).not.toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
+  });
