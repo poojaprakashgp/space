@@ -232,3 +232,30 @@ describe('OrderConfirmationPage', () => {
     expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
   });
 });
+
+
+
+
+it('should redirect to /phones if navigatedViaApp is not true', () => {
+  // Setup
+  const mockPush = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+
+  // Override sessionStorage.getItem for this test
+  const getItemSpy = jest.spyOn(sessionStorage, 'getItem');
+  getItemSpy.mockImplementation((key) => {
+    if (key === 'isAgenticEnabledOnConfirmation') return 'true';
+    if (key === 'checkoutCartInfo') return null;
+    if (key === 'navigatedViaApp') return null; // triggers else block
+    return null;
+  });
+
+  const removeItemSpy = jest.spyOn(sessionStorage, 'removeItem');
+
+  render(<OrderConfirmationPage />);
+
+  // Assertions
+  expect(removeItemSpy).not.toHaveBeenCalled();
+  expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
+});
+
