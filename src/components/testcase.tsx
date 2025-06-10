@@ -255,6 +255,31 @@ Received number of calls: 2
 2: "navigatedViaApp"Jest
 
 
+
+ it('should redirect to /phones if navigatedViaApp is not true', () => {
+  const mockPush = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+
+  // Reset sessionStorage mocks for this test
+  const getItemSpy = jest.spyOn(window.sessionStorage, 'getItem');
+  const removeItemSpy = jest.spyOn(window.sessionStorage, 'removeItem');
+
+  // Set mock implementation to return null (not "true")
+  getItemSpy.mockImplementation((key) => {
+    if (key === 'navigatedViaApp') return null; // <- triggers `else`
+    if (key === 'isAgenticEnabledOnConfirmation') return 'true';
+    if (key === 'checkoutCartInfo') return JSON.stringify([{ item: 'test' }]);
+    return null;
+  });
+
+  render(<OrderConfirmationPage />);
+
+  expect(removeItemSpy).not.toHaveBeenCalled(); // ✅ Now valid
+  expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
+});
+
+
+
  
 
  
