@@ -1,287 +1,135 @@
+export const formatPhoneNumber = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
 
-
- 	
-import React from 'react';
- 
-export const DevicePrice = ({
-  title,
-  price: { discountedPrice , fullPrice } = {
-    discountedPrice: '',
-    fullPrice: '',
-  },
-}: {
-  title: string;
-  price: { discountedPrice: string; fullPrice: string };
-}) => {
-  console.log(discountedPrice, 'pricepricepriceprice');
-  return (
-    <div className="phone-recommendation__title-price-wrapper">
-      <div className="plan-desc__title">{title}</div>
-      <p className="plan-desc__price">
-        <span className="font-light">{discountedPrice ?? fullPrice}</span>
-      </p>
-    </div>
-  );
+  if (digits.length <= 3) {
+    return digits;
+  } else if (digits.length <= 6) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  } else {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  }
 };
 
+export function formatCardExpiry(value: string): string {
+  // Remove any non-digit characters
+  const digits = value.replace(/\D/g, '');
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { DevicePrice } from './DevicePrice';
+  // Handle the formatting
+  if (digits.length <= 2) {
+    return digits;
+  } else {
+    // Format as MM/YYYY (always use full 4-digit year)
+    return `${digits.substring(0, 2)}/${digits.substring(2, 6)}`;
+  }
+}
 
-describe('DevicePrice Component', () => {
-  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+export interface CardBrandInfo {
+  brand: string;
+  cvvLength: number;
+  maxLength: number;
+}
 
-  afterEach(() => {
-    consoleLogSpy.mockClear();
-  });
+export const detectCardBrand = (cardNumber: string): CardBrandInfo => {
+  /* Remove all non-digits */
+  const digits = cardNumber.replace(/\D/g, '');
 
-  afterAll(() => {
-    consoleLogSpy.mockRestore();
-  });
+  /* Default card info */
+  const defaultCard: CardBrandInfo = {
+    brand: 'Unknown',
+    cvvLength: 3,
+    maxLength: 16,
+  };
+  /* Card detection patterns */
+  if (digits.startsWith('4')) {
+    return { brand: 'VISA', cvvLength: 3, maxLength: 16 };
+  } else if (
+    /^(5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d\d|27[0-1]\d|2720)/.test(digits)
+  ) {
+    return { brand: 'MASTERCARD', cvvLength: 3, maxLength: 16 };
+  } else if (/^3[47]/.test(digits)) {
+    return { brand: 'AMEX', cvvLength: 4, maxLength: 15 };
+  } else if (
+    /^(6011|6(?:4[4-9]|5\d)\d{2}|622(?:12[6-9]|1[3-9]\d|[2-9]\d\d))/.test(
+      digits,
+    )
+  ) {
+    return { brand: 'DISCOVER', cvvLength: 3, maxLength: 16 };
+  } else if (/^3(?:0[0-5]|6|8)/.test(digits)) {
+    return { brand: 'DINERSCLUB', cvvLength: 3, maxLength: 14 };
+  } else if (/^35(?:2[89]|[3-8]\d)/.test(digits)) {
+    return { brand: 'JCB', cvvLength: 3, maxLength: 16 };
+  } else if (
+    /^62/.test(digits) &&
+    !/^622(?:12[6-9]|1[3-9]\d|[2-9]\d\d)/.test(digits)
+  ) {
+    return { brand: 'UNIONPAY', cvvLength: 3, maxLength: 19 };
+  }
 
-  it('renders title and discounted price', () => {
-    render(
-      <DevicePrice
-        title="iPhone 14"
-        price={{ discountedPrice: '₹70,000', fullPrice: '₹80,000' }}
-      />
-    );
-
-    expect(screen.getByText('iPhone 14')).toBeInTheDocument();
-    expect(screen.getByText('₹70,000')).toBeInTheDocument();
-    expect(consoleLogSpy).toHaveBeenCalledWith('₹70,000', 'pricepricepriceprice');
-  });
-
-  it('renders title and falls back to fullPrice if discountedPrice is empty', () => {
-    render(
-      <DevicePrice
-        title="Samsung Galaxy"
-        price={{ discountedPrice: '', fullPrice: '₹60,000' }}
-      />
-    );
-
-    expect(screen.getByText('Samsung Galaxy')).toBeInTheDocument();
-    expect(screen.getByText('₹60,000')).toBeInTheDocument();
-    expect(consoleLogSpy).toHaveBeenCalledWith('', 'pricepricepriceprice');
-  });
-
-  it('renders title and empty price when both are empty', () => {
-    render(
-      <DevicePrice
-        title="Nokia"
-        price={{ discountedPrice: '', fullPrice: '' }}
-      />
-    );
-
-    expect(screen.getByText('Nokia')).toBeInTheDocument();
-    expect(screen.getByText('')).toBeInTheDocument(); // Empty span
-    expect(consoleLogSpy).toHaveBeenCalledWith('', 'pricepricepriceprice');
-  });
-});
-
-DevicePrice > renders title and falls back to fullPrice if discountedPrice is empty
------
-Error: Unable to find an element with the text: ₹60,000. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.Jest
-(method) matchers.TestingLibraryMatchers<any, void>.toBeInTheDocument(): void
-@description — Assert whether an element is present in the document or not.
-
-@example
-
-<svg data-testid="svg-element"></svg>
-
-
-
- DevicePrice > renders title and empty price when both are empty
------
-Error: Found multiple elements with the text: 
-
-Here are the matching elements:
-
-The detailed error message is suppressed by waitFor
-
-The detailed error message is suppressed by waitFor
-
-The detailed error message is suppressed by waitFor
-
-The detailed error message is suppressed by waitFor
-
-
-
- import React from 'react';
- 
-export const Preorder = ({ title = "", body = "" }) => {
-  return (
-    <div className="plan-desc-preorder-wrapper">
-      {title && (
-        <p>
-          {title}
-        </p>
-      )}
-      {body && (
-        <p>
-          {body}
-        </p>
-      )}
-    </div>
-  );
+  return defaultCard;
 };
 
+export const formatCardNumber = (value: string): string => {
+  // Remove all non-digits
+  const digits = value.replace(/\D/g, '');
 
-  it('renders both title and body when provided', () => {
-    render(<Preorder title="Preorder Now" body="Ships in 2 weeks" />);
-    expect(screen.getByText('Preorder Now')).toBeInTheDocument();
-    expect(screen.getByText('Ships in 2 weeks')).toBeInTheDocument();
-  });
+  /* Get card info */
+  const cardInfo = detectCardBrand(digits);
 
-  it('renders only title when body is empty', () => {
-    render(<Preorder title="Coming Soon" body="" />);
-    expect(screen.getByText('Coming Soon')).toBeInTheDocument();
-    expect(screen.queryByText('Ships in 2 weeks')).not.toBeInTheDocument();
-  });
+  /* Limit to card's specific max length */
+  const limitedDigits = digits.slice(0, cardInfo.maxLength);
 
-  it('renders only body when title is empty', () => {
-    render(<Preorder title="" body="Launching next month" />);
-    expect(screen.queryByText('Coming Soon')).not.toBeInTheDocument();
-    expect(screen.getByText('Launching next month')).toBeInTheDocument();
-  });
+  /* Format with spaces */
+  let formattedNumber = '';
 
-  it('renders nothing when both title and body are empty', () => {
-    const { container } = render(<Preorder title="" body="" />);
-    expect(container.querySelector('p')).toBeNull();
-  });
+  /* Special formatting for Amex (4-6-5 pattern) */
+  if (cardInfo.brand === 'American Express') {
+    if (limitedDigits.length >= 4) {
+      formattedNumber = limitedDigits.substring(0, 4);
 
+      if (limitedDigits.length > 4) {
+        const secondGroup = limitedDigits.substring(
+          4,
+          Math.min(10, limitedDigits.length),
+        );
+        formattedNumber += ` ${secondGroup}`;
 
- import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { Preorder } from './Preorder';
+        if (limitedDigits.length > 10) {
+          formattedNumber += ` ${limitedDigits.substring(10, 15)}`;
+        }
+      }
+    } else {
+      formattedNumber = limitedDigits;
+    }
+  } else {
+    /* Standard 4-4-4-4 pattern for all other cards including Diners Club */
+    for (let i = 0; i < limitedDigits.length; i += 4) {
+      if (i > 0) formattedNumber += ' ';
+      formattedNumber += limitedDigits.substring(
+        i,
+        Math.min(i + 4, limitedDigits.length),
+      );
+    }
+  }
 
-describe('Preorder Component', () => {
-  it('renders both title and body', () => {
-    render(<Preorder title="Preorder Now" body="Ships in 2 weeks" />);
-    expect(screen.getByText('Preorder Now')).toBeInTheDocument();
-    expect(screen.getByText('Ships in 2 weeks')).toBeInTheDocument();
-  });
-
-  it('renders only title when body is empty', () => {
-    render(<Preorder title="Coming Soon" body="" />);
-    expect(screen.getByText('Coming Soon')).toBeInTheDocument();
-    expect(screen.queryByText('Ships in 2 weeks')).not.toBeInTheDocument();
-  });
-
-  it('renders only body when title is empty', () => {
-    render(<Preorder title="" body="Launching next month" />);
-    expect(screen.queryByText('Coming Soon')).not.toBeInTheDocument();
-    expect(screen.getByText('Launching next month')).toBeInTheDocument();
-  });
-
-  it('renders nothing when both title and body are empty', () => {
-    const { container } = render(<Preorder title="" body="" />);
-    expect(container.querySelector('p')).toBeNull();
-  });
-});
-
-
-  it('uses default price prop when not provided', () => {
-    const { container } = render(
-      // @ts-expect-error - intentionally omitting `price` to trigger default
-      <DevicePrice title="Default Device" />
-    );
-    expect(screen.getByText('Default Device')).toBeInTheDocument();
-    const priceEl = container.querySelector('.font-light');
-    expect(priceEl?.textContent).toBe('');
-  });
-
- jest --coverage --collectCoverageFrom="src/components/DevicePrice.tsx"
-
- npm run test -- --coverage src/components/__tests__/DevicePrice.test.tsx
-
-
- import React from 'react';
-
-export const OutOfStock = ({ title }: { title: string }) => {
-  return (
-    <div className="phone-recommendation__out-of-stock">
-      <span className="phone-recommendation__out-of-stock--text">{title}</span>
-    </div>
-  );
+  return formattedNumber;
 };
 
- import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { OutOfStock } from './OutOfStock';
+export const cleanFormValue = (value: string = ''): string =>
+  value.replace(/[\s()]/g, '');
 
-describe('OutOfStock', () => {
-  it('renders the out-of-stock title', () => {
-    render(<OutOfStock title="Currently Unavailable" />);
-    expect(screen.getByText('Currently Unavailable')).toBeInTheDocument();
-  });
-});
+export const removeNonDigits = (value = ''): string => value.replace(/\D/g, '');
 
-
-
- it('should redirect to /phones if navigatedViaApp is not true', () => {
-  // Setup
-  const mockPush = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-
-  // Override sessionStorage.getItem for this test
-  const getItemSpy = jest.spyOn(sessionStorage, 'getItem');
-  getItemSpy.mockImplementation((key) => {
-    if (key === 'isAgenticEnabledOnConfirmation') return 'true';
-    if (key === 'checkoutCartInfo') return null;
-    if (key === 'navigatedViaApp') return null; // triggers else block
-    return null;
-  });
-
-  const removeItemSpy = jest.spyOn(sessionStorage, 'removeItem');
-
-  render(<OrderConfirmationPage />);
-
-  // Assertions
-  expect(removeItemSpy).not.toHaveBeenCalled();
-  expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
-});
-
-
- OrderConfirmationPage > should redirect to /phones if navigatedViaApp is not true
------
-Error: expect(jest.fn()).not.toHaveBeenCalled()
-
-Expected number of calls: 0
-Received number of calls: 2
-
-1: "navigatedViaApp"
-2: "navigatedViaApp"Jest
-
-
-
- it('should redirect to /phones if navigatedViaApp is not true', () => {
-  const mockPush = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-
-  // Reset sessionStorage mocks for this test
-  const getItemSpy = jest.spyOn(window.sessionStorage, 'getItem');
-  const removeItemSpy = jest.spyOn(window.sessionStorage, 'removeItem');
-
-  // Set mock implementation to return null (not "true")
-  getItemSpy.mockImplementation((key) => {
-    if (key === 'navigatedViaApp') return null; // <- triggers `else`
-    if (key === 'isAgenticEnabledOnConfirmation') return 'true';
-    if (key === 'checkoutCartInfo') return JSON.stringify([{ item: 'test' }]);
-    return null;
-  });
-
-  render(<OrderConfirmationPage />);
-
-  expect(removeItemSpy).not.toHaveBeenCalled(); // ✅ Now valid
-  expect(mockPush).toHaveBeenCalledWith(`${getBaseURL()}/phones`);
-});
-
-
-
- 
-
- 
- The iPhone 15 has several improvements over the iPhone 14. The iPhone 15 features Dynamic Island, a 48MP Main camera, and an A16 Bionic Chip. The iPhone 15's Super Retina XDR display is also brighter. Here's a comparison: * **Display:** iPhone 15's display is up to 2x brighter in the sun compared to iPhone 14. * **Camera:** iPhone 15 has a 48MP Main camera. * **Chip:** iPhone 15 uses the A16 Bionic Chip. * **Features:** iPhone 15 has Dynamic Island.
-
+/**
+ * Brand-specific card number regex patterns for use in validation rules.
+ * Use the correct regex for the detected brand.
+ */
+export const cardBrandRegexes: Record<string, RegExp> = {
+  Visa: /^(?:\d{4}[ -]?){1,3}\d{1,4}$/,
+  MasterCard: /^(?:\d{4}[ -]?){1,3}\d{1,4}$/,
+  'American Express': /^\d{4}[ -]?\d{6}[ -]?\d{5}$/,
+  Discover: /^(?:\d{4}[ -]?){1,3}\d{1,4}$/,
+  'Diners Club': /^\d{4}[ -]?\d{6}[ -]?\d{4}$/,
+  JCB: /^(?:\d{4}[ -]?){1,3}\d{1,4}$/,
+  UnionPay: /^(?:\d{4}[ -]?){1,4}\d{1,4}$/,
+  Unknown: /^(?:\d[ -]?){12,19}$/,
+};
