@@ -262,3 +262,62 @@ describe('cardBrandRegexes', () => {
   });
 });
 
+
+describe('detectCardBrand - additional property checks', () => {
+  it('returns correct cvvLength and maxLength for AMEX', () => {
+    const result = detectCardBrand('378282246310005');
+    expect(result).toEqual({ brand: 'AMEX', cvvLength: 4, maxLength: 15 });
+  });
+
+  it('returns default for unrecognized number', () => {
+    const result = detectCardBrand('999999999999');
+    expect(result).toEqual({ brand: 'Unknown', cvvLength: 3, maxLength: 16 });
+  });
+});
+
+describe('formatCardNumber - edge Amex formatting', () => {
+  it('formats Amex correctly with < 4 digits', () => {
+    expect(formatCardNumber('378')).toBe('378');
+  });
+
+  it('formats Amex correctly with 4-10 digits', () => {
+    expect(formatCardNumber('3782822463')).toBe('3782 822463');
+  });
+
+  it('formats Amex with exactly 15 digits', () => {
+    expect(formatCardNumber('378282246310005')).toBe('3782 822463 10005');
+  });
+});
+
+describe('formatCardNumber - generic brand format', () => {
+  it('formats Discover (non-Amex) in 4-4-4-4', () => {
+    expect(formatCardNumber('6011111111111117')).toBe('6011 1111 1111 1117');
+  });
+
+  it('formats JCB (max 16 digits)', () => {
+    expect(formatCardNumber('3530111333300000')).toBe('3530 1113 3330 0000');
+  });
+
+  it('formats UnionPay with max 19 digits', () => {
+    const number = '6240000000000000000';
+    expect(formatCardNumber(number)).toBe('6240 0000 0000 0000 000');
+  });
+});
+
+describe('cleanFormValue - extra cases', () => {
+  it('returns clean string when no special characters', () => {
+    expect(cleanFormValue('1234567890')).toBe('1234567890');
+  });
+
+  it('handles undefined string safely', () => {
+    expect(cleanFormValue(undefined)).toBe('');
+  });
+});
+
+describe('removeNonDigits - full non-digit string', () => {
+  it('returns empty string if all chars are non-digits', () => {
+    expect(removeNonDigits('abc!@#')).toBe('');
+  });
+});
+
+
