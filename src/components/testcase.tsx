@@ -133,3 +133,132 @@ export const cardBrandRegexes: Record<string, RegExp> = {
   UnionPay: /^(?:\d{4}[ -]?){1,4}\d{1,4}$/,
   Unknown: /^(?:\d[ -]?){12,19}$/,
 };
+
+
+
+
+
+
+import {
+  formatPhoneNumber,
+  formatCardExpiry,
+  detectCardBrand,
+  formatCardNumber,
+  cleanFormValue,
+  removeNonDigits,
+  cardBrandRegexes,
+} from './your-utils-file'; // <-- update path accordingly
+
+describe('formatPhoneNumber', () => {
+  it('formats < 3 digits', () => {
+    expect(formatPhoneNumber('12')).toBe('12');
+  });
+
+  it('formats 3-6 digits', () => {
+    expect(formatPhoneNumber('123456')).toBe('(123) 456');
+  });
+
+  it('formats more than 6 digits', () => {
+    expect(formatPhoneNumber('1234567890')).toBe('(123) 456-7890');
+  });
+
+  it('removes non-digits', () => {
+    expect(formatPhoneNumber('(123)-456')).toBe('(123) 456');
+  });
+});
+
+describe('formatCardExpiry', () => {
+  it('formats MM', () => {
+    expect(formatCardExpiry('12')).toBe('12');
+  });
+
+  it('formats MMYYYY', () => {
+    expect(formatCardExpiry('122025')).toBe('12/2025');
+  });
+
+  it('ignores non-digits', () => {
+    expect(formatCardExpiry('12/20a25')).toBe('12/2025');
+  });
+});
+
+describe('detectCardBrand', () => {
+  const brands = [
+    { number: '4111111111111111', brand: 'VISA' },
+    { number: '5555555555554444', brand: 'MASTERCARD' },
+    { number: '378282246310005', brand: 'AMEX', cvv: 4, max: 15 },
+    { number: '6011111111111117', brand: 'DISCOVER' },
+    { number: '30569309025904', brand: 'DINERSCLUB', max: 14 },
+    { number: '3530111333300000', brand: 'JCB' },
+    { number: '6240000000000000', brand: 'UNIONPAY', max: 19 },
+    { number: '9999999999999999', brand: 'Unknown' },
+  ];
+
+  brands.forEach(({ number, brand }) => {
+    it(`detects ${brand}`, () => {
+      expect(detectCardBrand(number).brand).toBe(brand);
+    });
+  });
+});
+
+describe('formatCardNumber', () => {
+  it('formats Visa (4x4x4x4)', () => {
+    expect(formatCardNumber('4111111111111111')).toBe('4111 1111 1111 1111');
+  });
+
+  it('formats Amex (4-6-5)', () => {
+    expect(formatCardNumber('378282246310005')).toBe('3782 822463 10005');
+  });
+
+  it('trims card number based on brand length', () => {
+    expect(formatCardNumber('378282246310005999999')).toBe('3782 822463 10005');
+    expect(formatCardNumber('41111111111111112222')).toBe('4111 1111 1111 1111');
+  });
+
+  it('handles short card numbers', () => {
+    expect(formatCardNumber('4111')).toBe('4111');
+  });
+
+  it('removes non-digit characters', () => {
+    expect(formatCardNumber('4111-1111 1111')).toBe('4111 1111 1111');
+  });
+});
+
+describe('cleanFormValue', () => {
+  it('removes spaces and brackets', () => {
+    expect(cleanFormValue('(123) 456 7890')).toBe('1234567890');
+  });
+
+  it('handles empty input', () => {
+    expect(cleanFormValue()).toBe('');
+  });
+});
+
+describe('removeNonDigits', () => {
+  it('removes non-digits', () => {
+    expect(removeNonDigits('(123)abc')).toBe('123');
+  });
+
+  it('handles undefined input', () => {
+    expect(removeNonDigits()).toBe('');
+  });
+});
+
+describe('cardBrandRegexes', () => {
+  const tests = [
+    { brand: 'Visa', number: '4111 1111 1111 1111' },
+    { brand: 'MasterCard', number: '5555 5555 5555 4444' },
+    { brand: 'American Express', number: '3782 822463 10005' },
+    { brand: 'Discover', number: '6011 1111 1111 1117' },
+    { brand: 'Diners Club', number: '3056 930902 5904' },
+    { brand: 'JCB', number: '3530 1113 3330 0000' },
+    { brand: 'UnionPay', number: '6240 0000 0000 0000 000' },
+    { brand: 'Unknown', number: '9999 9999 9999 9999' },
+  ];
+
+  tests.forEach(({ brand, number }) => {
+    it(`matches ${brand} number`, () => {
+      expect(cardBrandRegexes[brand].test(number)).toBe(true);
+    });
+  });
+});
+
