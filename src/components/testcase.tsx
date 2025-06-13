@@ -321,3 +321,19 @@ describe('removeNonDigits - full non-digit string', () => {
 });
 
 
+
+Field Formatters util > should formate card number properly for formats Amex correctly with >= 4 digits and <=10 digits
+-----
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: "3783 243545"
+Received: "3783 2435 45"Jest
+
+
+
+Field Formatters util > should formate card number properly for formats Amex correctly with >10 digits
+-----
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: "3783 243545 12345"
+Received: "3783 2435 4512 345"Jes
