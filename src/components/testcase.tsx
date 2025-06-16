@@ -87,3 +87,39 @@ Returns the current value associated with the given key, or null if the given ke
 
 MDN Reference
 
+
+
+if (PRICE_FILTERS) {
+      PRICE_FILTERS.forEach((option) => {
+        // For each PRICE_FILTER option, check which priceObj range it falls into
+        priceObj.forEach((priceObjItem) => {
+          const optionMinPrice =
+            option.valueGTE !== undefined ? Number(option.valueGTE) : undefined;
+          const optionMaxPrice =
+            option.valueLTE !== undefined ? Number(option.valueLTE) : undefined;
+          if (
+            optionMinPrice !== undefined &&
+            optionMaxPrice !== undefined &&
+            optionMinPrice >= priceObjItem.valueGTE &&
+            optionMaxPrice <= priceObjItem.valueLTE
+          ) {
+            // Add this option's title to the ref
+            priceObjToFiltersMapRef.current[priceObjItem.title].push(
+              option.title,
+            );
+          }
+        });
+      });
+    }
+
+"if (
+            optionMinPrice !== undefined &&
+            optionMaxPrice !== undefined &&
+            optionMinPrice >= priceObjItem.valueGTE &&
+            optionMaxPrice <= priceObjItem.valueLTE
+          ) {
+            // Add this option's title to the ref
+            priceObjToFiltersMapRef.current[priceObjItem.title].push(
+              option.title,
+            );
+          }" cover the lines inside qoutes
