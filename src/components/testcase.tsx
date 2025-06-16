@@ -76,3 +76,14 @@ describe('Filter logic inside component', () => {
   });
 });
 
+
+ProductsList Component > should handle JSON.parse failure and clear session storage items
+-----
+Error: expect(received).toBeNull()
+
+Received: "[{\"productId\":\"phone1\",\"content\":{\"section\":[]}}]"Jest
+(method) Storage.getItem(key: string): string | null
+Returns the current value associated with the given key, or null if the given key does not exist.
+
+MDN Reference
+
