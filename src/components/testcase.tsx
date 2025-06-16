@@ -1,100 +1,38 @@
-export function handleFilterChipsAndSession({
-  source,
-  newFilterChips,
-  setFilters,
-}: any) {
-  if (source.includes('chat-intent') || source.includes('command-dispatcher')) {
-    setFilters(newFilterChips);
-    try {
-      const filterChipObjects = newFilterChips.map((chip: any) => ({
-        id: `filter-${Date.now()}-${uuidv4()}`,
-        type: getFilterType(chip),
-        value: chip,
-      }));
-      sessionStorage.setItem(
-        'selectedFilters',
-        JSON.stringify(filterChipObjects),
-      );
-    } catch (error) {
-      console.error(
-        'Error updating selected filters in session storage:',
-        error,
-      );
+ // render the page with filtered results from session storage if available.
+  // To handle global redirection.  Handle SSR & CSR rendering
+  if (typeof window !== 'undefined') {
+    const filteredProductData = sessionStorage.getItem(
+      'agenticFilteredResults',
+    );
+    const queryUsed = sessionStorage.getItem('agenticQuery');
+    const isChooseDifferentPhone = sessionStorage.getItem(
+      'chooseDifferentPhone',
+    );
+    if (isChooseDifferentPhone && filteredProductData) {
       try {
-        sessionStorage.setItem('selectedFilters', JSON.stringify([]));
-      } catch (fallbackError) {
-        console.error(
-          'Failed to recover from session storage error:',
-          fallbackError,
-        );
+        const parsedResults = JSON.parse(filteredProductData);
+ 
+        // Dispatch action to update products in plpContext
+        dispatch(fetchFilteredProductsSuccess(parsedResults));
+ 
+        // Set the filter with the original search query if available
+        if (queryUsed) {
+          setFilters([queryUsed]);
+        }
+ 
+        // Clear the stored results after using them to prevent reuse on subsequent visits
+        // Comment this out if you want the results to persist across multiple visits
+        sessionStorage.removeItem('agenticFilteredResults');
+        sessionStorage.removeItem('agenticQuery');
+        sessionStorage.removeItem('chooseDifferentPhone');
+      } catch (error) {
+        console.error('Error parsing stored search results:', error);
+        // Clear the stored results after using them to prevent reuse on subsequent visits
+        // Comment this out if you want the results to persist across multiple visits
+        sessionStorage.removeItem('agenticFilteredResults');
+        sessionStorage.removeItem('agenticQuery');
+        sessionStorage.removeItem('chooseDifferentPhone');
       }
     }
-  } else {
-    setFilters((prevFilters: any) => {
-      const deduplicatedPrevFilters = prevFilters.filter((prevFilter: any) => {
-        const isPriceFilter = getFilterType(prevFilter) === 'price';
-        const isStockFilter = getFilterType(prevFilter) === 'availability';
-        Iif (
-          isPriceFilter &&
-          newFilterChips.some((f: any) => getFilterType(f) === 'price')//
-        )
-          return false;//
-        Iif (
-          isStockFilter &&
-          newFilterChips.some((f: any) => getFilterType(f) === 'availability')
-        )
-          return false;//
-        if (!isPriceFilter && !isStockFilter) {
-          return !newFilterChips.includes(prevFilter);
-        }
-        return true;
-      });
-      return [...deduplicatedPrevFilters, ...newFilterChips];
-    });
   }
-}
-
-
-
-import { handleFilterChipsAndSession } from './your-utils-file'; // change path
-import { v4 as uuidv4 } from 'uuid';
-
-jest.mock('uuid', () => ({ v4: jest.fn(() => 'mock-uuid') }));
-
-const mockGetFilterType = jest.fn();
-jest.mock('./your-utils-file', () => {
-  const actual = jest.requireActual('./your-utils-file');
-  return {
-    ...actual,
-    getFilterType: (value: string) => {
-      if (value.includes('Price')) return 'price';
-      if (value.includes('Stock')) return 'availability';
-      return 'other';
-    },
-  };
-});
-
-describe('handleFilterChipsAndSession', () => {
-  it('removes old price and stock filters when new ones exist', () => {
-    const prevFilters = ['OldPriceFilter', 'OldStockFilter', 'KeepThisFilter'];
-    const newFilterChips = ['NewPriceFilter', 'NewStockFilter'];
-
-    const setFilters = jest.fn((cb) => {
-      const final = cb(prevFilters);
-      expect(final).toEqual([
-        'KeepThisFilter', // ✅ kept
-        'NewPriceFilter', // ✅ new
-        'NewStockFilter', // ✅ new
-      ]);
-    });
-
-    handleFilterChipsAndSession({
-      source: 'other',
-      newFilterChips,
-      setFilters,
-    });
-
-    expect(setFilters).toHaveBeenCalled();
-  });
-});
-
+please cover the catch block lines of code under unit test cases apart from console.error and comments
