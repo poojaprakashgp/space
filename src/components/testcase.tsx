@@ -123,3 +123,42 @@ if (PRICE_FILTERS) {
               option.title,
             );
           }" cover the lines inside qoutes
+
+
+
+it('should push option title when option range is within priceObj range', () => {
+  const PRICE_FILTERS = [
+    { title: 'Low Range', valueGTE: 100, valueLTE: 200 },
+  ];
+  const priceObj = [
+    { title: 'Master Range', valueGTE: 50, valueLTE: 300 },
+  ];
+
+  const priceObjToFiltersMapRef = {
+    current: {
+      'Master Range': [],
+    },
+  };
+
+  // Call the function / logic
+  PRICE_FILTERS.forEach((option) => {
+    priceObj.forEach((priceObjItem) => {
+      const optionMinPrice =
+        option.valueGTE !== undefined ? Number(option.valueGTE) : undefined;
+      const optionMaxPrice =
+        option.valueLTE !== undefined ? Number(option.valueLTE) : undefined;
+
+      if (
+        optionMinPrice !== undefined &&
+        optionMaxPrice !== undefined &&
+        optionMinPrice >= priceObjItem.valueGTE &&
+        optionMaxPrice <= priceObjItem.valueLTE
+      ) {
+        priceObjToFiltersMapRef.current[priceObjItem.title].push(option.title);
+      }
+    });
+  });
+
+  expect(priceObjToFiltersMapRef.current['Master Range']).toEqual(['Low Range']);
+});
+
