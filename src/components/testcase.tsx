@@ -88,77 +88,27 @@ Returns the current value associated with the given key, or null if the given ke
 MDN Reference
 
 
-
-if (PRICE_FILTERS) {
-      PRICE_FILTERS.forEach((option) => {
-        // For each PRICE_FILTER option, check which priceObj range it falls into
-        priceObj.forEach((priceObjItem) => {
-          const optionMinPrice =
-            option.valueGTE !== undefined ? Number(option.valueGTE) : undefined;
-          const optionMaxPrice =
-            option.valueLTE !== undefined ? Number(option.valueLTE) : undefined;
-          if (
-            optionMinPrice !== undefined &&
-            optionMaxPrice !== undefined &&
-            optionMinPrice >= priceObjItem.valueGTE &&
-            optionMaxPrice <= priceObjItem.valueLTE
-          ) {
-            // Add this option's title to the ref
-            priceObjToFiltersMapRef.current[priceObjItem.title].push(
-              option.title,
+// Explicitly check for cases where a price object in the current filters
+    // needs to be replaced by its remaining specific filter options
+    filters.forEach((filter) => {
+      priceObj.forEach((priceObjItem) => {
+        Iif (filter === priceObjItem.title) {
+          const specificFiltersForPriceObj =
+            priceObjToFiltersMapRef.current[priceObjItem.title] || [];
+          const hasUnselectedSpecificFilters = unselectedTitles.some((title) =>
+            specificFiltersForPriceObj.includes(title),
+          );
+ 
+          Iif (hasUnselectedSpecificFilters) {
+            priceObjToRemove.push(priceObjItem.title);
+ 
+            // Add any remaining filters not in unselectedTitles
+            const retainedSpecificFilters = specificFiltersForPriceObj.filter(
+              (title) => !unselectedTitles.includes(title),
             );
+            specificPriceFiltersToAdd.push(...retainedSpecificFilters);
           }
-        });
+        }
       });
-    }
-
-"if (
-            optionMinPrice !== undefined &&
-            optionMaxPrice !== undefined &&
-            optionMinPrice >= priceObjItem.valueGTE &&
-            optionMaxPrice <= priceObjItem.valueLTE
-          ) {
-            // Add this option's title to the ref
-            priceObjToFiltersMapRef.current[priceObjItem.title].push(
-              option.title,
-            );
-          }" cover the lines inside qoutes
-
-
-
-it('should push option title when option range is within priceObj range', () => {
-  const PRICE_FILTERS = [
-    { title: 'Low Range', valueGTE: 100, valueLTE: 200 },
-  ];
-  const priceObj = [
-    { title: 'Master Range', valueGTE: 50, valueLTE: 300 },
-  ];
-
-  const priceObjToFiltersMapRef = {
-    current: {
-      'Master Range': [],
-    },
-  };
-
-  // Call the function / logic
-  PRICE_FILTERS.forEach((option) => {
-    priceObj.forEach((priceObjItem) => {
-      const optionMinPrice =
-        option.valueGTE !== undefined ? Number(option.valueGTE) : undefined;
-      const optionMaxPrice =
-        option.valueLTE !== undefined ? Number(option.valueLTE) : undefined;
-
-      if (
-        optionMinPrice !== undefined &&
-        optionMaxPrice !== undefined &&
-        optionMinPrice >= priceObjItem.valueGTE &&
-        optionMaxPrice <= priceObjItem.valueLTE
-      ) {
-        priceObjToFiltersMapRef.current[priceObjItem.title].push(option.title);
-      }
-    });
-  });
-
-  expect(priceObjToFiltersMapRef.current['Master Range']).toEqual(['Low Range']);
-});
+    });please cover all the lines which is mentioend inside Iif
 
