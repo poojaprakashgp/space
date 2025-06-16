@@ -26,3 +26,33 @@ export function applyBrandFilter({
   }
   return { filteredPhones, newFilterChips };
 }
+
+
+
+it('returns false if phoneProductData is missing productId (covers !phoneData)', () => {
+    const filteredPhones = [];
+    const newFilterChips = [];
+    const filterUpdates = {
+      brand: ['samsung'],
+    };
+    const phoneProductData = {
+      // purposely leaving out productId 'p1'
+      // so the condition `!phoneData` triggers
+    };
+    const plpData = {
+      products: [
+        { productId: 'p1' }, // this will be skipped because p1 is not in phoneProductData
+      ],
+    };
+
+    const result = applyBrandFilter({
+      filteredPhones,
+      newFilterChips,
+      filterUpdates,
+      phoneProductData,
+      plpData,
+    });
+
+    expect(result.filteredPhones).toEqual([]); // Because phoneData is missing
+    expect(result.newFilterChips).toContain('Samsung');
+  });
