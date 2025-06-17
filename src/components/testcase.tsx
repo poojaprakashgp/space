@@ -114,3 +114,72 @@
       router.push(destination);
     }
   };
+
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+}));
+
+const router = require('next/router').useRouter();
+
+const phoneProductData = {
+  phone1: { offerPrice: 20000, phoneType: 'flagship' },
+  phone2: { offerPrice: 25000, phoneType: 'flagship' },
+  phone3: { offerPrice: 30000, phoneType: 'flagship' },
+  phone4: { offerPrice: 22000, phoneType: 'midrange' },
+};
+
+
+it('should find adjacent priced products within the same phone type', () => {
+  const phoneList = [
+    { productId: 'phone1' },
+    { productId: 'phone2' },
+    { productId: 'phone3' },
+  ];
+
+  handleProductSelection('phone2', '/product', phoneList, phoneProductData);
+
+  expect(router.push).toHaveBeenCalledWith('/product?rec=phone1,phone3');
+});
+it('should fallback to full list if same phone type has no neighbors', () => {
+  const phoneList = [
+    { productId: 'phone2' }, // type: flagship
+    { productId: 'phone4' }, // type: midrange
+  ];
+
+  handleProductSelection('phone2', '/product', phoneList, phoneProductData);
+
+  // since same type = only one phone, fallback happens
+  expect(router.push).toHaveBeenCalledWith('/product?rec=phone4,');
+});
+it('should handle phoneList with 2 or fewer items (early return)', () => {
+  const phoneList = [
+    { productId: 'phone1' },
+    { productId: 'phone2' },
+  ];
+
+  handleProductSelection('phone1', '/product', phoneList, phoneProductData);
+
+  // No adjacent neighbors
+  expect(router.push).toHaveBeenCalledWith('/product');
+});
+it('should fallback to destination if productId is invalid', () => {
+  const phoneList = [{ productId: 'phone1' }];
+
+  handleProductSelection('invalid-id', '/product', phoneList, phoneProductData);
+
+  expect(router.push).toHaveBeenCalledWith('/product');
+});
+it('should find only one adjacent phone if selected phone is first in list', () => {
+  const phoneList = [
+    { productId: 'phone1' },
+    { productId: 'phone2' },
+    { productId: 'phone3' },
+  ];
+
+  handleProductSelection('phone1', '/product', phoneList, phoneProductData);
+
+  expect(router.push).toHaveBeenCalledWith('/product?rec=,phone2');
+});
