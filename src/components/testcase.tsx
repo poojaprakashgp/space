@@ -289,3 +289,13 @@ it('skips loading if image is already loaded from cache', () => {
   // This simulates internal logic, but to truly unit test it, you’d expose `ref` or break out useEffect logic
   // Ideally use integration test for this behavior
 });
+
+
+PlanDetails Component > calls setLoading and setAgenticPageLoader on BackButton click
+-----
+Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: true
+
+Number of calls: 0Jest
+const mockSetLoading: jest.Mock<any, any, any>
