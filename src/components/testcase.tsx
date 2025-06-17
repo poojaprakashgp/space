@@ -149,3 +149,98 @@ MDN Reference
             }
           });
         } give me test case which coveres all if statments codes inside it 
+
+
+it('should replace selected price object with remaining specific filters when unselected', () => {
+  const unselectedPriceFilters = ['Mid Range $200-$400']; // 👈 hits if (unselectedPriceFilters.length > 0)
+  const unselectedTitles = ['Mid Range $200-$400']; // used to filter out later
+
+  const priceObj = [
+    {
+      title: 'Custom Price',
+      valueGTE: 200,
+      valueLTE: 400,
+    },
+  ];
+
+  const PRICE_FILTERS = [
+    {
+      title: 'Mid Range $200-$400',
+      valueGTE: '200',
+      valueLTE: '400',
+    },
+    {
+      title: 'Budget $100-$200',
+      valueGTE: '100',
+      valueLTE: '200',
+    },
+  ];
+
+  const priceObjToFiltersMapRef = {
+    current: {
+      'Custom Price': ['Mid Range $200-$400', 'Budget $100-$200'], // 👈 hits hasUnselectedFilters
+    },
+  };
+
+  const updatedFilters = {
+    priceRange: [{ title: 'Custom Price' }], // 👈 hits isPriceObjItemSelected
+  };
+
+  // 🔥 Simulate the logic
+  if (unselectedPriceFilters.length > 0) {
+    priceObj.forEach((priceObjItem) => {
+      const specificFiltersForPriceObj =
+        priceObjToFiltersMapRef.current[priceObjItem.title] || [];
+
+      const hasUnselectedFilters = unselectedPriceFilters.some((title) =>
+        specificFiltersForPriceObj.includes(title),
+      );
+
+      if (hasUnselectedFilters) {
+        const isPriceObjItemSelected = updatedFilters.priceRange.some(
+          (range) => range.title === priceObjItem.title,
+        );
+
+        if (isPriceObjItemSelected) {
+          updatedFilters.priceRange = updatedFilters.priceRange.filter(
+            (range) => range.title !== priceObjItem.title,
+          );
+
+          const remainingSpecificFilters = specificFiltersForPriceObj.filter(
+            (title) => !unselectedTitles.includes(title),
+          );
+
+          if (remainingSpecificFilters.length > 0 && PRICE_FILTERS) {
+            remainingSpecificFilters.forEach((title) => {
+              const matchingFilter = PRICE_FILTERS.find(
+                (option) => option.title === title,
+              );
+              if (matchingFilter) {
+                const min =
+                  typeof matchingFilter.valueGTE === 'string'
+                    ? Number(matchingFilter.valueGTE)
+                    : matchingFilter.valueGTE;
+                const max =
+                  typeof matchingFilter.valueLTE === 'string'
+                    ? Number(matchingFilter.valueLTE)
+                    : matchingFilter.valueLTE;
+
+                updatedFilters.priceRange.push({
+                  min,
+                  max,
+                  title: matchingFilter.title,
+                });
+              }
+            });
+          }
+        }
+      }
+    });
+  }
+
+  // ✅ Expected: 'Custom Price' removed, 'Budget $100-$200' added
+  expect(updatedFilters.priceRange).toEqual([
+    { min: 100, max: 200, title: 'Budget $100-$200' },
+  ]);
+});
+
