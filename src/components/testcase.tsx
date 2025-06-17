@@ -89,158 +89,40 @@ MDN Reference
 
 
 
-  if (unselectedPriceFilters.length > 0) {
-          // For each price object, check if any of its specific filters were unselected
-          priceObj.forEach((priceObjItem) => {
-            const specificFiltersForPriceObj =
-              priceObjToFiltersMapRef.current[priceObjItem.title] || [];
-
-            // Check if any of the unselected filters belong to this price object
-            const hasUnselectedFilters = unselectedPriceFilters.some((title) =>
-              specificFiltersForPriceObj.includes(title),
-            );
-
-            if (hasUnselectedFilters) {
-              // Check if this price object is currently selected
-              const isPriceObjItemSelected = updatedFilters.priceRange.some(
-                (range: { title?: string }) =>
-                  range.title === priceObjItem.title,
-              );
-
-              if (isPriceObjItemSelected) {
-                // Remove the price object
-                updatedFilters.priceRange = updatedFilters.priceRange.filter(
-                  (range: { title?: string }) =>
-                    range.title !== priceObjItem.title,
-                );
-
-                // Add back the remaining all filters price ranges that weren't unselected
-                const remainingSpecificFilters =
-                  specificFiltersForPriceObj.filter(
-                    (title) => !unselectedTitles.includes(title),
-                  );
-
-                // Find the corresponding price filter options and add them to the priceRange
-                if (remainingSpecificFilters.length > 0 && PRICE_FILTERS) {
-                  remainingSpecificFilters.forEach((title) => {
-                    const matchingFilter = PRICE_FILTERS.find(
-                      (option) => option.title === title,
-                    );
-                    if (matchingFilter) {
-                      // Convert valueGTE and valueLTE to numbers if they're strings
-                      const min =
-                        typeof matchingFilter.valueGTE === 'string'
-                          ? Number(matchingFilter.valueGTE)
-                          : matchingFilter.valueGTE;
-                      const max =
-                        typeof matchingFilter.valueLTE === 'string'
-                          ? Number(matchingFilter.valueLTE)
-                          : matchingFilter.valueLTE;
-
-                      updatedFilters.priceRange.push({
-                        min,
-                        max,
-                        title: matchingFilter.title,
-                      });
-                    }
-                  });
-                }
-              }
-            }
-          });
-        } give me test case which coveres all if statments codes inside it 
-
-
-it('should replace selected price object with remaining specific filters when unselected', () => {
-  const unselectedPriceFilters = ['Mid Range $200-$400']; // 👈 hits if (unselectedPriceFilters.length > 0)
-  const unselectedTitles = ['Mid Range $200-$400']; // used to filter out later
-
-  const priceObj = [
-    {
-      title: 'Custom Price',
-      valueGTE: 200,
-      valueLTE: 400,
-    },
-  ];
-
-  const PRICE_FILTERS = [
-    {
-      title: 'Mid Range $200-$400',
-      valueGTE: '200',
-      valueLTE: '400',
-    },
-    {
-      title: 'Budget $100-$200',
-      valueGTE: '100',
-      valueLTE: '200',
-    },
-  ];
-
-  const priceObjToFiltersMapRef = {
-    current: {
-      'Custom Price': ['Mid Range $200-$400', 'Budget $100-$200'], // 👈 hits hasUnselectedFilters
-    },
-  };
-
-  const updatedFilters = {
-    priceRange: [{ title: 'Custom Price' }], // 👈 hits isPriceObjItemSelected
-  };
-
-  // 🔥 Simulate the logic
-  if (unselectedPriceFilters.length > 0) {
-    priceObj.forEach((priceObjItem) => {
-      const specificFiltersForPriceObj =
-        priceObjToFiltersMapRef.current[priceObjItem.title] || [];
-
-      const hasUnselectedFilters = unselectedPriceFilters.some((title) =>
-        specificFiltersForPriceObj.includes(title),
-      );
-
-      if (hasUnselectedFilters) {
-        const isPriceObjItemSelected = updatedFilters.priceRange.some(
-          (range) => range.title === priceObjItem.title,
-        );
-
-        if (isPriceObjItemSelected) {
-          updatedFilters.priceRange = updatedFilters.priceRange.filter(
-            (range) => range.title !== priceObjItem.title,
+  selectedAllFilters.forEach((filter) => {
+        switch (filter.attr) {
+        case 'brand':
+          if (filter.title && !updatedFilters.brand.includes(filter.title)) {
+            updatedFilters.brand.push(filter.title);
+          }
+          break;
+ 
+        case 'phoneType':
+          Iif (
+            filter.title &&
+              !updatedFilters.phoneType.includes(filter.title)
+          ) {
+            updatedFilters.phoneType.push(filter.title);
+          }
+          break;
+        case 'offerPrice': {
+          const titleExists = updatedFilters.priceRange.some(
+            (range: { title?: string }) => range.title === filter.title,
           );
-
-          const remainingSpecificFilters = specificFiltersForPriceObj.filter(
-            (title) => !unselectedTitles.includes(title),
-          );
-
-          if (remainingSpecificFilters.length > 0 && PRICE_FILTERS) {
-            remainingSpecificFilters.forEach((title) => {
-              const matchingFilter = PRICE_FILTERS.find(
-                (option) => option.title === title,
-              );
-              if (matchingFilter) {
-                const min =
-                  typeof matchingFilter.valueGTE === 'string'
-                    ? Number(matchingFilter.valueGTE)
-                    : matchingFilter.valueGTE;
-                const max =
-                  typeof matchingFilter.valueLTE === 'string'
-                    ? Number(matchingFilter.valueLTE)
-                    : matchingFilter.valueLTE;
-
-                updatedFilters.priceRange.push({
-                  min,
-                  max,
-                  title: matchingFilter.title,
-                });
-              }
+ 
+          if (!titleExists) {
+            updatedFilters.priceRange.push({
+              min: filter.valueGTE,
+              max: filter.valueLTE,
+              title: filter.title,
             });
           }
+          break;
         }
-      }
-    });
-  }
-
-  // ✅ Expected: 'Custom Price' removed, 'Budget $100-$200' added
-  expect(updatedFilters.priceRange).toEqual([
-    { min: 100, max: 200, title: 'Budget $100-$200' },
-  ]);
-});
-
+        case '5G':
+          updatedFilters['5G'] = filter.title?.toLowerCase() !== 'no';
+          break;
+        default:
+          break;
+        }
+      });cover the lines under case 'phonetype', '5G' and default
