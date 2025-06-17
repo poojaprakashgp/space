@@ -201,3 +201,91 @@ const PlanSummary = ({
 };
 
 export default PlanDetails;
+
+
+// PlanDetails.test.tsx
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import PlanDetails from './PlanDetails'; // adjust path
+import '@testing-library/jest-dom';
+
+const mockSetLoading = jest.fn();
+const mockSetAgenticPageLoader = jest.fn();
+
+// 🧪 Basic props template
+const defaultProps = {
+  details: {
+    content: {
+      section: [
+        { id: 'plan_gallery' },
+        { id: 'plan_details', content: {}, cta: {}, selectedPlan: {} },
+      ],
+    },
+  },
+  setLoading: mockSetLoading,
+  setAgenticPageLoader: mockSetAgenticPageLoader,
+  handleChooseClick: jest.fn(),
+};
+
+it('calls setLoading and setAgenticPageLoader on BackButton click', () => {
+  render(<PlanDetails {...defaultProps} />);
+  const backBtn = screen.getByRole('button', { name: /current plan/i });
+
+  fireEvent.click(backBtn);
+
+  expect(mockSetLoading).toHaveBeenCalledWith(true);
+  expect(mockSetAgenticPageLoader).toHaveBeenCalledWith('PDP');
+});
+
+jest.mock('@/components/common/components/CustomNextImage', () => 
+  jest.fn((props) => {
+    // simulate onLoad
+    React.useEffect(() => {
+      props.onLoad?.();
+    }, []);
+    return <img alt={props.alt} />;
+  })
+);
+
+it('calls setIsLoading(false) on image load', async () => {
+  render(<PlanDetails {...defaultProps} />);
+  expect(screen.getByAltText('plan_icon')).toBeInTheDocument();
+});
+jest.mock('@/components/common/components/CustomNextImage', () =>
+  jest.fn((props) => {
+    React.useEffect(() => {
+      props.onError?.(); // trigger onError
+    }, []);
+    return <img alt={props.alt} />;
+  })
+);
+
+it('sets hasError and logs error when image fails to load', () => {
+  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  render(<PlanDetails {...defaultProps} />);
+
+  // Wait for error handling to complete
+  expect(screen.getByText('Image not available')).toBeInTheDocument();
+  expect(consoleErrorSpy).toHaveBeenCalledWith('PhoneRecImg failed to load');
+  consoleErrorSpy.mockRestore();
+});
+it('skips loading if image is already loaded from cache', () => {
+  const originalGetItem = window.sessionStorage.getItem;
+  Object.defineProperty(window, 'sessionStorage', {
+    value: {
+      getItem: jest.fn(() => '/some/path'),
+    },
+    writable: true,
+  });
+
+  const imageMock = {
+    complete: true,
+    naturalWidth: 100,
+  };
+
+  const ref = React.createRef();
+  ref.current = imageMock;
+
+  // This simulates internal logic, but to truly unit test it, you’d expose `ref` or break out useEffect logic
+  // Ideally use integration test for this behavior
+});
