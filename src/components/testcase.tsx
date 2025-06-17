@@ -299,3 +299,49 @@ Expected: true
 
 Number of calls: 0Jest
 const mockSetLoading: jest.Mock<any, any, any>
+
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import PlanDetails from './PlanDetails';
+
+jest.mock('@/common/molecules/BackButton/BackButton', () => {
+  return ({ onClick }: any) => (
+    <button onClick={onClick}>Current Plan</button>
+  );
+});
+
+jest.mock('@/components/common/components/CustomNextImage', () => () => (
+  <img alt="plan_icon" />
+));
+
+const mockSetLoading = jest.fn();
+const mockSetAgenticPageLoader = jest.fn();
+
+describe('PlanDetails Component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    sessionStorage.setItem('pdpReferPath', '/mock-path');
+  });
+
+  it('calls setLoading and setAgenticPageLoader on BackButton click', () => {
+    render(
+      <PlanDetails
+        details={{
+          content: {
+            section: [{ id: 'plan_gallery' }],
+          },
+        }}
+        setLoading={mockSetLoading}
+        setAgenticPageLoader={mockSetAgenticPageLoader}
+      />
+    );
+
+    const backBtn = screen.getByRole('button', { name: /current plan/i });
+    fireEvent.click(backBtn);
+
+    expect(mockSetLoading).toHaveBeenCalledWith(true);
+    expect(mockSetAgenticPageLoader).toHaveBeenCalledWith('PDP');
+  });
+});
+
