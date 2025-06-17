@@ -153,3 +153,30 @@ it('should replace a priceObj title with its remaining specific filters when som
   expect(priceObjToRemove).toEqual(['Mid Range']);
   expect(specificPriceFiltersToAdd).toEqual(['$150-$250', '$200-$300']);
 });
+
+ setFilters((prevFilters) => {
+      // First remove any directly unselected titles from the filters
+      let updatedFilters = prevFilters.filter(
+        (title) => !unselectedTitles.includes(title),
+      );
+ 
+      // Then remove any price objects that need to be removed due to partial deselection
+      updatedFilters = updatedFilters.filter(
+        (title) => !priceObjToRemove.includes(title),
+      );
+ 
+      // Add new filters that weren't in the previous filters
+      const newFilters = selectedTitles.filter(
+        (title) =>
+          !prevFilters.includes(title) && !priceObjToRemove.includes(title),
+      );
+ 
+      // Add specific price filters that need to be added due to price object removal
+      specificPriceFiltersToAdd.forEach((title) => {
+        Iif (!updatedFilters.includes(title) && !newFilters.includes(title)) {
+          newFilters.push(title);
+        }
+      });
+ 
+      return [...updatedFilters, ...newFilters];
+    }); give me test cases to cover the lines inside setFilters
