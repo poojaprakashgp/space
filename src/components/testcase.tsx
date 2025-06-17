@@ -88,170 +88,64 @@ Returns the current value associated with the given key, or null if the given ke
 MDN Reference
 
 
-// Explicitly check for cases where a price object in the current filters
-    // needs to be replaced by its remaining specific filter options
-    filters.forEach((filter) => {
-      priceObj.forEach((priceObjItem) => {
-        Iif (filter === priceObjItem.title) {
-          const specificFiltersForPriceObj =
-            priceObjToFiltersMapRef.current[priceObjItem.title] || [];
-          const hasUnselectedSpecificFilters = unselectedTitles.some((title) =>
-            specificFiltersForPriceObj.includes(title),
-          );
- 
-          Iif (hasUnselectedSpecificFilters) {
-            priceObjToRemove.push(priceObjItem.title);
- 
-            // Add any remaining filters not in unselectedTitles
-            const retainedSpecificFilters = specificFiltersForPriceObj.filter(
-              (title) => !unselectedTitles.includes(title),
+
+  if (unselectedPriceFilters.length > 0) {
+          // For each price object, check if any of its specific filters were unselected
+          priceObj.forEach((priceObjItem) => {
+            const specificFiltersForPriceObj =
+              priceObjToFiltersMapRef.current[priceObjItem.title] || [];
+
+            // Check if any of the unselected filters belong to this price object
+            const hasUnselectedFilters = unselectedPriceFilters.some((title) =>
+              specificFiltersForPriceObj.includes(title),
             );
-            specificPriceFiltersToAdd.push(...retainedSpecificFilters);
-          }
-        }
-      });
-    });please cover all the lines which is mentioend inside Iif
 
-it('should replace a priceObj title with its remaining specific filters when some are unselected', () => {
-  const filters = ['Mid Range']; // This matches `priceObjItem.title`
-  const priceObj = [{ title: 'Mid Range' }];
+            if (hasUnselectedFilters) {
+              // Check if this price object is currently selected
+              const isPriceObjItemSelected = updatedFilters.priceRange.some(
+                (range: { title?: string }) =>
+                  range.title === priceObjItem.title,
+              );
 
-  const priceObjToFiltersMapRef = {
-    current: {
-      'Mid Range': ['$100-$200', '$150-$250', '$200-$300'],
-    },
-  };
+              if (isPriceObjItemSelected) {
+                // Remove the price object
+                updatedFilters.priceRange = updatedFilters.priceRange.filter(
+                  (range: { title?: string }) =>
+                    range.title !== priceObjItem.title,
+                );
 
-  const unselectedTitles = ['$100-$200']; // One is unselected
-  const priceObjToRemove: string[] = [];
-  const specificPriceFiltersToAdd: string[] = [];
+                // Add back the remaining all filters price ranges that weren't unselected
+                const remainingSpecificFilters =
+                  specificFiltersForPriceObj.filter(
+                    (title) => !unselectedTitles.includes(title),
+                  );
 
-  // 💥 Run the logic you're testing
-  filters.forEach((filter) => {
-    priceObj.forEach((priceObjItem) => {
-      if (filter === priceObjItem.title) {
-        const specificFiltersForPriceObj =
-          priceObjToFiltersMapRef.current[priceObjItem.title] || [];
+                // Find the corresponding price filter options and add them to the priceRange
+                if (remainingSpecificFilters.length > 0 && PRICE_FILTERS) {
+                  remainingSpecificFilters.forEach((title) => {
+                    const matchingFilter = PRICE_FILTERS.find(
+                      (option) => option.title === title,
+                    );
+                    if (matchingFilter) {
+                      // Convert valueGTE and valueLTE to numbers if they're strings
+                      const min =
+                        typeof matchingFilter.valueGTE === 'string'
+                          ? Number(matchingFilter.valueGTE)
+                          : matchingFilter.valueGTE;
+                      const max =
+                        typeof matchingFilter.valueLTE === 'string'
+                          ? Number(matchingFilter.valueLTE)
+                          : matchingFilter.valueLTE;
 
-        const hasUnselectedSpecificFilters = unselectedTitles.some((title) =>
-          specificFiltersForPriceObj.includes(title),
-        );
-
-        if (hasUnselectedSpecificFilters) {
-          priceObjToRemove.push(priceObjItem.title);
-
-          const retainedSpecificFilters = specificFiltersForPriceObj.filter(
-            (title) => !unselectedTitles.includes(title),
-          );
-          specificPriceFiltersToAdd.push(...retainedSpecificFilters);
-        }
-      }
-    });
-  });
-
-  // ✅ Asserts
-  expect(priceObjToRemove).toEqual(['Mid Range']);
-  expect(specificPriceFiltersToAdd).toEqual(['$150-$250', '$200-$300']);
-});
-
- setFilters((prevFilters) => {
-      // First remove any directly unselected titles from the filters
-      let updatedFilters = prevFilters.filter(
-        (title) => !unselectedTitles.includes(title),
-      );
- 
-      // Then remove any price objects that need to be removed due to partial deselection
-      updatedFilters = updatedFilters.filter(
-        (title) => !priceObjToRemove.includes(title),
-      );
- 
-      // Add new filters that weren't in the previous filters
-      const newFilters = selectedTitles.filter(
-        (title) =>
-          !prevFilters.includes(title) && !priceObjToRemove.includes(title),
-      );
- 
-      // Add specific price filters that need to be added due to price object removal
-      specificPriceFiltersToAdd.forEach((title) => {
-        Iif (!updatedFilters.includes(title) && !newFilters.includes(title)) {
-          newFilters.push(title);
-        }
-      });
- 
-      return [...updatedFilters, ...newFilters];
-    }); give me test cases to cover the lines inside setFilters
-
-
-it('should update filters correctly based on unselected titles, priceObj removals, and specific additions', () => {
-  const prevFilters = ['Mid Range', '$100-$200', '5G']; // OG filters
-  const unselectedTitles = ['$100-$200']; // Directly unselected
-  const priceObjToRemove = ['Mid Range']; // Composite filter to remove
-  const selectedTitles = ['4G', '$150-$250']; // New selected titles
-  const specificPriceFiltersToAdd = ['$200-$300']; // Specific filters from removed price group
-
-  // 💥 Simulate setFilters logic
-  const result = (() => {
-    let updatedFilters = prevFilters.filter(
-      (title) => !unselectedTitles.includes(title),
-    );
-
-    updatedFilters = updatedFilters.filter(
-      (title) => !priceObjToRemove.includes(title),
-    );
-
-    const newFilters = selectedTitles.filter(
-      (title) =>
-        !prevFilters.includes(title) && !priceObjToRemove.includes(title),
-    );
-
-    specificPriceFiltersToAdd.forEach((title) => {
-      if (!updatedFilters.includes(title) && !newFilters.includes(title)) {
-        newFilters.push(title); // ✅ covers the if block!
-      }
-    });
-
-    return [...updatedFilters, ...newFilters];
-  })();
-
-  // ✅ Expected output:
-  // prevFilters - $100-$200 & Mid Range removed
-  // selectedTitles - 4G & $150-$250 added
-  // specific - $200-$300 added via forEach + if
-  expect(result).toEqual(['5G', '4G', '$150-$250', '$200-$300']);
-});
-it('should NOT add specific price filter if it already exists in updatedFilters or newFilters', () => {
-  const prevFilters = ['Mid Range', '5G'];
-  const unselectedTitles = []; // Nothing directly unselected
-  const priceObjToRemove = []; // No priceObj removed
-  const selectedTitles = ['Mid Range', '4G']; // ‘Mid Range’ already in prevFilters
-  const specificPriceFiltersToAdd = ['4G']; // This is already being added
-
-  // 💥 Run setFilters logic inline
-  const result = (() => {
-    let updatedFilters = prevFilters.filter(
-      (title) => !unselectedTitles.includes(title),
-    );
-
-    updatedFilters = updatedFilters.filter(
-      (title) => !priceObjToRemove.includes(title),
-    );
-
-    const newFilters = selectedTitles.filter(
-      (title) =>
-        !prevFilters.includes(title) && !priceObjToRemove.includes(title),
-    );
-
-    specificPriceFiltersToAdd.forEach((title) => {
-      if (!updatedFilters.includes(title) && !newFilters.includes(title)) {
-        // 👇 This should NOT run
-        newFilters.push(title);
-      }
-    });
-
-    return [...updatedFilters, ...newFilters];
-  })();
-
-  // ✅ 4G should only appear once, not from the specific add
-  expect(result).toEqual(['Mid Range', '5G', '4G']);
-});
-
+                      updatedFilters.priceRange.push({
+                        min,
+                        max,
+                        title: matchingFilter.title,
+                      });
+                    }
+                  });
+                }
+              }
+            }
+          });
+        } give me test case which coveres all if statments codes inside it 
