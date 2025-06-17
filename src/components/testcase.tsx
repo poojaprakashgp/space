@@ -87,9 +87,29 @@ Returns the current value associated with the given key, or null if the given ke
 
 MDN Reference
 
+it('should handle JSON.parse failure and clear session storage items', () => {
+  // Mock invalid JSON
+  sessionStorage.setItem('agenticFilteredResults', 'INVALID_JSON'); // <-- 💥 force parse failure
+  sessionStorage.setItem('agenticQuery', 'query');
+  sessionStorage.setItem('chooseDifferentPhone', 'true');
 
-
-
+  // Spy and mock JSON.parse to throw
+  jest.spyOn(JSON, 'parse').mockImplementation(() => {
+    throw new Error('Invalid JSON');
   });
+
+  render(<YourComponent />); // This will trigger the logic in your useEffect
+
+  // ✅ Check sessionStorage was cleared
+  expect(sessionStorage.getItem('agenticFilteredResults')).toBeNull();
+  expect(sessionStorage.getItem('agenticQuery')).toBeNull();
+  expect(sessionStorage.getItem('chooseDifferentPhone')).toBeNull();
+
+  // ❌ dispatch should NOT be called since JSON.parse failed
+  expect(dispatchMock).not.toHaveBeenCalled();
+
+  // ✅ Clean up the mock to avoid side effects in other tests
+  jest.restoreAllMocks();
 });
+
 
