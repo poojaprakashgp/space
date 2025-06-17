@@ -21,3 +21,14 @@ export const handleValidations=(name: string, value: string, errorData: any) => 
   }
     
 }
+ it('should return invalid message for empty value (required validation)', () => {
+    const errorData = {
+      first_name: {
+        invalid: 'First name is required',
+      },
+    };
+
+    const result = handleValidations('first_name', '', errorData);
+
+    expect(result).toBe('First name is required'); // ✅ covers the first `return errorData[name]?.invalid`
+  });
