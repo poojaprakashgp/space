@@ -174,3 +174,10 @@ describe('PlanDetails Component — 100% Coverage', () => {
     expect(screen.getByText('Choose plan')).toBeInTheDocument(); // from default prop
   });
 });
+
+
+
+
+PlanDetails Component — 100% Coverage > renders without selectedPlan, cta or content gracefully
+-----
+Error: Unable to find an element with the text: Choose plan. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.Jest
