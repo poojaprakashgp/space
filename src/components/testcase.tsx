@@ -119,3 +119,54 @@ var Error: ErrorConstructor
 new (message?: string, options?: ErrorOptions) => Error (+1 overload)
 No quick fixes available
 
+
+
+import { render } from '@testing-library/react';
+import YourComponent from './YourComponent';
+import { fetchFilteredProductsSuccess } from 'path-to-your-actions'; // adjust this
+import { useDispatch } from 'react-redux';
+
+// 🧪 Mock your dispatch
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useDispatch: jest.fn(),
+}));
+
+describe('ProductsList Component', () => {
+  let dispatchMock: jest.Mock;
+
+  beforeEach(() => {
+    // 🔁 Fresh mock for each test
+    dispatchMock = jest.fn();
+    (useDispatch as jest.Mock).mockReturnValue(dispatchMock);
+
+    // 🔧 Set sessionStorage
+    sessionStorage.setItem('agenticFilteredResults', 'INVALID_JSON');
+    sessionStorage.setItem('agenticQuery', 'some-query');
+    sessionStorage.setItem('chooseDifferentPhone', 'true');
+
+    // 💥 Force JSON.parse to fail
+    jest.spyOn(JSON, 'parse').mockImplementation(() => {
+      throw new Error('Invalid JSON');
+    });
+  });
+
+  afterEach(() => {
+    // 🧼 Clean mocks & session
+    jest.restoreAllMocks();
+    sessionStorage.clear();
+  });
+
+  it('should handle JSON.parse failure and clear session storage items', () => {
+    render(<YourComponent />); // ⬅️ this triggers the logic
+
+    // ✅ Make sure session storage got cleared
+    expect(sessionStorage.getItem('agenticFilteredResults')).toBeNull();
+    expect(sessionStorage.getItem('agenticQuery')).toBeNull();
+    expect(sessionStorage.getItem('chooseDifferentPhone')).toBeNull();
+
+    // ✅ Dispatch should NOT be called due to parse error
+    expect(dispatchMock).not.toHaveBeenCalled();
+  });
+});
+
