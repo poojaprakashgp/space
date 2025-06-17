@@ -13,6 +13,14 @@
     data: main?.data?.products,
   };
 
+jest.mock('someDataSource', () => ({
+  PLP_NODE: {
+    details: {
+      accordion: { content: { section: [{ id: 'not-price' }] } },
+      content: {}, // missing section
+    },
+  },
+}));
 
   it('should fallback to empty options when price component is not found', () => {
     const mockPLP_NODE = {
