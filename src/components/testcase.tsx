@@ -112,4 +112,10 @@ it('should handle JSON.parse failure and clear session storage items', () => {
   jest.restoreAllMocks();
 });
 
+ProductsList Component > should handle JSON.parse failure and clear session storage items
+-----
+Error: Invalid JSONJest
+var Error: ErrorConstructor
+new (message?: string, options?: ErrorOptions) => Error (+1 overload)
+No quick fixes available
 
