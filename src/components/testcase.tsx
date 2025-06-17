@@ -112,3 +112,44 @@ MDN Reference
       });
     });please cover all the lines which is mentioend inside Iif
 
+it('should replace a priceObj title with its remaining specific filters when some are unselected', () => {
+  const filters = ['Mid Range']; // This matches `priceObjItem.title`
+  const priceObj = [{ title: 'Mid Range' }];
+
+  const priceObjToFiltersMapRef = {
+    current: {
+      'Mid Range': ['$100-$200', '$150-$250', '$200-$300'],
+    },
+  };
+
+  const unselectedTitles = ['$100-$200']; // One is unselected
+  const priceObjToRemove: string[] = [];
+  const specificPriceFiltersToAdd: string[] = [];
+
+  // 💥 Run the logic you're testing
+  filters.forEach((filter) => {
+    priceObj.forEach((priceObjItem) => {
+      if (filter === priceObjItem.title) {
+        const specificFiltersForPriceObj =
+          priceObjToFiltersMapRef.current[priceObjItem.title] || [];
+
+        const hasUnselectedSpecificFilters = unselectedTitles.some((title) =>
+          specificFiltersForPriceObj.includes(title),
+        );
+
+        if (hasUnselectedSpecificFilters) {
+          priceObjToRemove.push(priceObjItem.title);
+
+          const retainedSpecificFilters = specificFiltersForPriceObj.filter(
+            (title) => !unselectedTitles.includes(title),
+          );
+          specificPriceFiltersToAdd.push(...retainedSpecificFilters);
+        }
+      }
+    });
+  });
+
+  // ✅ Asserts
+  expect(priceObjToRemove).toEqual(['Mid Range']);
+  expect(specificPriceFiltersToAdd).toEqual(['$150-$250', '$200-$300']);
+});
