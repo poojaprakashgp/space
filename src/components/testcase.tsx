@@ -1,47 +1,23 @@
- const PRICE_FILTERS =
-    PLP_NODE &&
-    (
-      PLP_NODE.details.accordion.content.section?.find(
-        (comp) => comp?.id === 'price',
-      ) || { options: [] }//
-    ).options;
+const Validators: { [key: string]: RegExp } = {
+  zip_code: /^\d{5}$/,
+  phone_number: /^\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}$/,
+  email: /^[a-zA-Z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+  first_name: /^[a-zA-Z]+(?:[- '][a-zA-Z]+)*$/,
+  last_name: /^[a-zA-Z]+(?:[- '][a-zA-Z]+)*$/,
+  address: /^[a-zA-Z0-9\s,.'#-]{5,100}$/,
+  city: /^[a-zA-Z]+(?:[\s-][A-Za-z]+)*$/,
+};
  
-  const plpData = {
-    title: PLP_NODE?.details?.title,
-    cta: PLP_NODE?.details?.cta?.text,
-    products: PLP_NODE?.details?.content?.section || [],//
-    data: main?.data?.products,
-  };
-
-jest.mock('someDataSource', () => ({
-  PLP_NODE: {
-    details: {
-      accordion: { content: { section: [{ id: 'not-price' }] } },
-      content: {}, // missing section
-    },
-  },
-}));
-
-  it('should fallback to empty options when price component is not found', () => {
-    const mockPLP_NODE = {
-      details: {
-        accordion: {
-          content: {
-            section: [
-              { id: 'not-price', options: ['x'] } // 💥 no 'price' id here
-            ]
-          }
-        },
-        content: {} // section is undefined
-      }
-    };
-
-    render(<MyComponent PLP_NODE={mockPLP_NODE} />); // or pass as prop, or mock globally
-
-    // ✅ Now test behavior/output based on:
-    // - PRICE_FILTERS === [] 
-    // - products === []
-    // Example (adjust based on component):
-    expect(screen.queryByText('Some Option')).not.toBeInTheDocument();
-    expect(screen.queryAllByTestId('product-tile')).toHaveLength(0);
-  });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const handleValidations=(name: string, value: string, errorData: any) => {
+  Iif(name !== 'address_2' && ( value == null || value == undefined || value == '')){
+    // change invalid to required after SOE changes
+    return errorData[name]?.invalid; // cover thid line in unit test case
+  }else if(Validators[name] && !Validators[name].test(value)){
+    return errorData[name]?.invalid;
+  }
+  else{
+    return '';
+  }
+    
+}
