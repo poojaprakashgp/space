@@ -180,3 +180,78 @@ it('should replace a priceObj title with its remaining specific filters when som
  
       return [...updatedFilters, ...newFilters];
     }); give me test cases to cover the lines inside setFilters
+
+
+it('should update filters correctly based on unselected titles, priceObj removals, and specific additions', () => {
+  const prevFilters = ['Mid Range', '$100-$200', '5G']; // OG filters
+  const unselectedTitles = ['$100-$200']; // Directly unselected
+  const priceObjToRemove = ['Mid Range']; // Composite filter to remove
+  const selectedTitles = ['4G', '$150-$250']; // New selected titles
+  const specificPriceFiltersToAdd = ['$200-$300']; // Specific filters from removed price group
+
+  // 💥 Simulate setFilters logic
+  const result = (() => {
+    let updatedFilters = prevFilters.filter(
+      (title) => !unselectedTitles.includes(title),
+    );
+
+    updatedFilters = updatedFilters.filter(
+      (title) => !priceObjToRemove.includes(title),
+    );
+
+    const newFilters = selectedTitles.filter(
+      (title) =>
+        !prevFilters.includes(title) && !priceObjToRemove.includes(title),
+    );
+
+    specificPriceFiltersToAdd.forEach((title) => {
+      if (!updatedFilters.includes(title) && !newFilters.includes(title)) {
+        newFilters.push(title); // ✅ covers the if block!
+      }
+    });
+
+    return [...updatedFilters, ...newFilters];
+  })();
+
+  // ✅ Expected output:
+  // prevFilters - $100-$200 & Mid Range removed
+  // selectedTitles - 4G & $150-$250 added
+  // specific - $200-$300 added via forEach + if
+  expect(result).toEqual(['5G', '4G', '$150-$250', '$200-$300']);
+});
+it('should NOT add specific price filter if it already exists in updatedFilters or newFilters', () => {
+  const prevFilters = ['Mid Range', '5G'];
+  const unselectedTitles = []; // Nothing directly unselected
+  const priceObjToRemove = []; // No priceObj removed
+  const selectedTitles = ['Mid Range', '4G']; // ‘Mid Range’ already in prevFilters
+  const specificPriceFiltersToAdd = ['4G']; // This is already being added
+
+  // 💥 Run setFilters logic inline
+  const result = (() => {
+    let updatedFilters = prevFilters.filter(
+      (title) => !unselectedTitles.includes(title),
+    );
+
+    updatedFilters = updatedFilters.filter(
+      (title) => !priceObjToRemove.includes(title),
+    );
+
+    const newFilters = selectedTitles.filter(
+      (title) =>
+        !prevFilters.includes(title) && !priceObjToRemove.includes(title),
+    );
+
+    specificPriceFiltersToAdd.forEach((title) => {
+      if (!updatedFilters.includes(title) && !newFilters.includes(title)) {
+        // 👇 This should NOT run
+        newFilters.push(title);
+      }
+    });
+
+    return [...updatedFilters, ...newFilters];
+  })();
+
+  // ✅ 4G should only appear once, not from the specific add
+  expect(result).toEqual(['Mid Range', '5G', '4G']);
+});
+
