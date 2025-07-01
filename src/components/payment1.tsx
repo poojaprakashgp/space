@@ -1,3 +1,6 @@
+ const [paymentMethod, setPaymentMethod] = useState('card');
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+
 <div className="flex items-center space-x-6">
           <label className="flex items-center space-x-2">
             <input
