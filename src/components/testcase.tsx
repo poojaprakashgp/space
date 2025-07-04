@@ -1123,3 +1123,139 @@ export default function SmartPayModal() {
   );
 }
 
+
+'use client';
+
+import React from 'react';
+
+export interface ButtonProps {
+  primary?: boolean;
+  backgroundColor?: string;
+  size?: 'small' | 'medium' | 'large' | 'xl';
+  label: string | React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
+  textColor?: boolean;
+  textColorValue?: string;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+  dataGtmCta?: string;
+  dataTestId?: string;
+  ariaLabel?: string;
+}
+
+export const Button = ({
+  primary,
+  size = 'medium',
+  label,
+  className,
+  textColor,
+  onClick,
+  textColorValue,
+  icon,
+  disabled = false,
+  dataGtmCta,
+  dataTestId,
+  ariaLabel,
+}: ButtonProps) => {
+  let textColorClass = 'button--text-white';
+  if (textColorValue) {
+    textColorClass = 'button-custom-text';
+  } else if (textColor) {
+    textColorClass = 'button--text-dark';
+  }
+  const buttonClasses = [
+    'button',
+    primary ? 'button--primary' : 'button--secondary',
+    `button--${size}`,
+    textColorClass,
+    className,
+  ].join(' ');
+  return (
+    <button
+      type='button'
+      className={`${buttonClasses}`}
+      onClick={onClick}
+      disabled={disabled}
+      data-gtm-cta={dataGtmCta}
+      data-testid={dataTestId}
+      aria-label={ariaLabel}
+    >
+      {icon} {label}
+    </button>
+  );
+};
+
+export default Button;
+$spacing: 0.25rem;
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 9999px;
+  border: 0;
+  cursor: pointer;
+  outline: none;
+  line-height: calc(1.25 / 0.875);
+  color: #fff;
+
+  &--primary {
+    background-color: var(--button-primary-color);
+  }
+
+  &--secondary {
+    background-color: #575cb0;
+
+    &:hover {
+      outline-color: var(--other-bg-color);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline-color: var(--order-confirmation-secondary-color);
+    }
+  }
+
+  &--small {
+    padding-block: calc(#{$spacing} * 3);
+    padding-inline: 1.25rem;
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  &--medium {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  &--large {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  &--xl {
+    padding: 0.75rem 2.5rem;
+    font-size: 0.875rem;
+  }
+
+  &--text-dark {
+    color: #1a1c35;
+  }
+
+  &--custom-text {
+    color: inherit;
+  }
+  &--line-height {
+    line-height: calc(1.25 / 0.0875);
+  }
+  &--disabled {
+    background: #e0e0e0 !important;
+    color: #b0b0b0 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+
