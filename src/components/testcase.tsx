@@ -1004,4 +1004,122 @@ export default function SmartPayModal() {
   }
 }
 
+finalllll
+
+
+
+'use client';
+
+import { useState } from 'react';
+import './SmartPayModal.scss';
+
+const faqs = [
+  {
+    question: 'How do I lease with Smartpay?',
+    answer:
+      'Simply select SmartPay as your payment option at checkout. You will be asked to complete your SmartPay application before completing your transaction.',
+  },
+  {
+    question: 'What can I lease with Smartpay?',
+    answer: 'Phones, accessories, and more — as per vendor policy.',
+  },
+  {
+    question: 'How much does SmartPay cost?',
+    answer: 'Cost varies by lease amount, term, and approval criteria.',
+  },
+  {
+    question: 'How many lease payments will I have?',
+    answer: 'Typically monthly or bi-weekly. Final terms at checkout.',
+  },
+  {
+    question: 'How can I return my leased items?',
+    answer: 'Contact SmartPay support or return via original retailer.',
+  },
+];
+
+export default function SmartPayModal() {
+  const [activeTab, setActiveTab] = useState<'about' | 'faq'>('about');
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="smartpay-modal" role="dialog" aria-modal="true" aria-labelledby="smartpay-modal-title">
+      <h2 id="smartpay-modal-title" className="visually-hidden">SmartPay Lease Information</h2>
+
+      <div className="tab-container" role="tablist" aria-label="SmartPay information tabs">
+        <button
+          role="tab"
+          id="tab-about"
+          aria-selected={activeTab === 'about'}
+          aria-controls="tabpanel-about"
+          className={`tab ${activeTab === 'about' ? 'active' : ''}`}
+          onClick={() => setActiveTab('about')}
+        >
+          About
+        </button>
+        <button
+          role="tab"
+          id="tab-faq"
+          aria-selected={activeTab === 'faq'}
+          aria-controls="tabpanel-faq"
+          className={`tab ${activeTab === 'faq' ? 'active' : ''}`}
+          onClick={() => setActiveTab('faq')}
+        >
+          FAQS
+        </button>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === 'about' ? (
+          <div
+            role="tabpanel"
+            id="tabpanel-about"
+            aria-labelledby="tab-about"
+          >
+            <p>
+              Our Lease-to-own program is not available in MN, NJ, WI, WY and PR. You can use an alternate address to proceed, otherwise you will have to select a new payment method to continue.
+            </p>
+            <ul>
+              <li>✔️ Apply in seconds</li>
+              <li>💰 Get up to $1500</li>
+              <li>📆 Pay over time</li>
+            </ul>
+          </div>
+        ) : (
+          <div
+            role="tabpanel"
+            id="tabpanel-faq"
+            aria-labelledby="tab-faq"
+          >
+            <div className="faq">
+              {faqs.map((faq, index) => (
+                <div key={index} className="faq-item">
+                  <button
+                    className="faq-question"
+                    aria-expanded={openIndex === index}
+                    aria-controls={`faq-answer-${index}`}
+                    id={`faq-question-${index}`}
+                    onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  >
+                    {faq.question}
+                    <span>{openIndex === index ? '−' : '+'}</span>
+                  </button>
+                  <div
+                    id={`faq-answer-${index}`}
+                    role="region"
+                    aria-labelledby={`faq-question-${index}`}
+                    className="faq-answer"
+                    hidden={openIndex !== index}
+                    aria-hidden={openIndex !== index}
+                  >
+                    {faq.answer}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
