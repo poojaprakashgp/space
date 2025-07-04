@@ -1258,4 +1258,14 @@ $spacing: 0.25rem;
   }
 }
 
+<Button
+  role="tab"
+  aria-selected={activeTab === 'about'}
+  aria-controls="tabpanel-about"
+  ariaLabel="About tab"
+  label="About"
+  size="small"
+  className={`tab ${activeTab === 'about' ? 'active' : ''}`}
+  onClick={() => setActiveTab('about')}
+/>
 
