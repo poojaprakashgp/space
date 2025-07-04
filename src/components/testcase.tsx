@@ -308,3 +308,123 @@ export default function SmartPayModal() {
   }
 }
 
+
+
+
+
+
+
+
+
+
+.smartpay-modal {
+  .tab-header {
+    display: flex;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 1rem;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: none;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &.active,
+    &:hover {
+      background-color: #fff;
+      border-bottom: 2px solid #0070f3;
+      font-weight: 600;
+    }
+  }
+
+  .tab-content {
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-top: none;
+  }
+
+  .tab-panel {
+    animation: fadeIn 0.3s ease;
+  }
+
+  .faq-item {
+    margin-top: 0.75rem;
+    line-height: 1.6;
+    font-size: 14px;
+    color: #444;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+
+'use client';
+import { useState } from 'react';
+import './SmartPayModal.scss';
+
+const tabItems = ['Card', 'PayPal', 'FAQ'];
+
+export const SmartPayModal = () => {
+  const [activeTab, setActiveTab] = useState('Card');
+
+  return (
+    <div className="smartpay-modal">
+      {/* Tab Header */}
+      <div className="tab-header">
+        {tabItems.map((item) => (
+          <button
+            key={item}
+            className={`tab-button ${activeTab === item ? 'active' : ''}`}
+            onClick={() => setActiveTab(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="tab-content">
+        {activeTab === 'Card' && (
+          <div className="tab-panel">
+            <h3>Pay with Card</h3>
+            <p>All card payment form goes here ✨</p>
+          </div>
+        )}
+
+        {activeTab === 'PayPal' && (
+          <div className="tab-panel">
+            <h3>Pay with PayPal</h3>
+            <p>PayPal integration stuff goes here 💸</p>
+          </div>
+        )}
+
+        {activeTab === 'FAQ' && (
+          <div className="tab-panel">
+            <h3>Frequently Asked Questions</h3>
+            <div className="faq-item">
+              <strong>Q1:</strong> How secure is the payment?
+              <br />
+              <span>A: Super secure. Like Fort Knox 🏰</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
