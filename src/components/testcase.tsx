@@ -737,3 +737,175 @@ export default function SmartPayModal() {
     }
   }
 
+
+
+
+
+
+
+
+.smartpay-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 20px 20px 10px;
+    position: relative;
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      cursor: pointer;
+      font-size: 22px;
+      color: #999;
+      background: none;
+      border: none;
+
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+
+  .modal-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin: 0 20px;
+
+    .tab-button {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 600;
+      font-size: 16px;
+      color: #666;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #000;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 30%;
+          right: 30%;
+          height: 3px;
+          background-color: #d31f27;
+          border-radius: 3px;
+        }
+      }
+
+      &.active {
+        color: #000;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 30%;
+          right: 30%;
+          height: 3px;
+          background-color: #d31f27;
+          border-radius: 3px;
+        }
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 20px;
+
+    .tab-panel {
+      font-size: 15px;
+      color: #333;
+      line-height: 1.5;
+
+      .highlight-text {
+        font-weight: 500;
+        margin-bottom: 20px;
+      }
+
+      .about-list {
+        list-style: none;
+        padding: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          margin-bottom: 16px;
+          font-size: 15px;
+          color: #333;
+
+          img {
+            width: 20px;
+            margin-right: 10px;
+          }
+        }
+      }
+
+      details {
+        border-top: 1px solid #eee;
+        padding: 16px 0;
+
+        summary {
+          font-weight: 600;
+          font-size: 15px;
+          cursor: pointer;
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+
+          &::marker {
+            display: none;
+          }
+        }
+
+        p {
+          margin-top: 8px;
+          color: #555;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+
