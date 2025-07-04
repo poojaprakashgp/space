@@ -1269,3 +1269,134 @@ $spacing: 0.25rem;
   onClick={() => setActiveTab('about')}
 />
 
+// components/Tabs.tsx
+import React from 'react';
+import Button from './Button';
+
+interface TabItem {
+  id: string;
+  label: string;
+}
+
+interface TabsProps {
+  activeTab: string;
+  tabs: TabItem[];
+  onChange: (id: string) => void;
+}
+
+export default function Tabs({ activeTab, tabs, onChange }: TabsProps) {
+  return (
+    <div className="tab-container" role="tablist" aria-label="SmartPay information tabs">
+      {tabs.map(({ id, label }) => (
+        <Button
+          key={id}
+          role="tab"
+          aria-selected={activeTab === id}
+          aria-controls={`tabpanel-${id}`}
+          ariaLabel={`${label} tab`}
+          label={label}
+          size="small"
+          className={`tab ${activeTab === id ? 'active' : ''}`}
+          onClick={() => onChange(id)}
+        />
+      ))}
+    </div>
+  );
+}
+// components/FaqItem.tsx
+import React from 'react';
+import Button from './Button';
+
+interface FaqItemProps {
+  question: string;
+  answer: string;
+  index: number;
+  openIndex: number | null;
+  onToggle: (index: number) => void;
+}
+
+export default function FaqItem({ question, answer, index, openIndex, onToggle }: FaqItemProps) {
+  const isOpen = openIndex === index;
+  return (
+    <div className="faq-item">
+      <Button
+        className="faq-question"
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${index}`}
+        ariaLabel={question}
+        label={
+          <span className="flex-between">
+            {question} <span>{isOpen ? '−' : '+'}</span>
+          </span>
+        }
+        onClick={() => onToggle(index)}
+        size="medium"
+      />
+      <div
+        id={`faq-answer-${index}`}
+        role="region"
+        aria-labelledby={`faq-question-${index}`}
+        className="faq-answer"
+        hidden={!isOpen}
+        aria-hidden={!isOpen}
+      >
+        {answer}
+      </div>
+    </div>
+  );
+}
+'use client';
+
+import { useState } from 'react';
+import './SmartPayModal.scss';
+import Tabs from './Tabs';
+import FaqItem from './FaqItem';
+
+const faqs = [/* ... same FAQ array ... */];
+
+const tabItems = [
+  { id: 'about', label: 'About' },
+  { id: 'faq', label: 'FAQS' },
+];
+
+export default function SmartPayModal() {
+  const [activeTab, setActiveTab] = useState<'about' | 'faq'>('about');
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="smartpay-modal" role="dialog" aria-modal="true" aria-labelledby="smartpay-modal-title">
+      <h2 id="smartpay-modal-title" className="visually-hidden">SmartPay Lease Information</h2>
+
+      <Tabs activeTab={activeTab} tabs={tabItems} onChange={(id) => setActiveTab(id as 'about' | 'faq')} />
+
+      <div className="tab-content">
+        {activeTab === 'about' ? (
+          <div role="tabpanel" id="tabpanel-about" aria-labelledby="tab-about">
+            <p>
+              Our Lease-to-own program is not available in MN, NJ, WI, WY and PR. You can use an alternate address to proceed, otherwise you will have to select a new payment method to continue.
+            </p>
+            <ul>
+              <li>✔️ Apply in seconds</li>
+              <li>💰 Get up to $1500</li>
+              <li>📆 Pay over time</li>
+            </ul>
+          </div>
+        ) : (
+          <div role="tabpanel" id="tabpanel-faq" aria-labelledby="tab-faq">
+            <div className="faq">
+              {faqs.map((faq, index) => (
+                <FaqItem
+                  key={index}
+                  {...faq}
+                  index={index}
+                  openIndex={openIndex}
+                  onToggle={(i) => setOpenIndex(openIndex === i ? null : i)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
