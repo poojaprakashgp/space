@@ -428,3 +428,91 @@ export const SmartPayModal = () => {
 };
 
 
+'use client';
+
+import { useState } from 'react';
+import './SmartPayModal.scss';
+
+const faqs = [
+  {
+    question: 'How do I lease with Smartpay?',
+    answer:
+      'Simply select SmartPay as your payment option at checkout. You will be asked to complete your SmartPay application before completing your transaction.',
+  },
+  {
+    question: 'What can I lease with Smartpay?',
+    answer: 'Phones, accessories, and more — as per vendor policy.',
+  },
+  {
+    question: 'How much does SmartPay cost?',
+    answer: 'Cost varies by lease amount, term, and approval criteria.',
+  },
+  {
+    question: 'How many lease payments will I have?',
+    answer: 'Typically monthly or bi-weekly. Final terms at checkout.',
+  },
+  {
+    question: 'How can I return my leased items?',
+    answer: 'Contact SmartPay support or return via original retailer.',
+  },
+];
+
+export default function SmartPayModal() {
+  const [activeTab, setActiveTab] = useState<'about' | 'faq'>('about');
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="smartpay-modal">
+      <div className="tab-container">
+        <div
+          className={`tab ${activeTab === 'about' ? 'active' : ''}`}
+          onClick={() => setActiveTab('about')}
+        >
+          About
+        </div>
+        <div
+          className={`tab ${activeTab === 'faq' ? 'active' : ''}`}
+          onClick={() => setActiveTab('faq')}
+        >
+          FAQS
+        </div>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === 'about' ? (
+          <div className="about">
+            <p>
+              Our Lease-to-own program is not available in MN, NJ, WI, WY and PR. You can use an alternate address to proceed, otherwise you will have to select a new payment method to continue.
+            </p>
+            <ul>
+              <li>✔️ Apply in seconds</li>
+              <li>💰 Get up to $1500</li>
+              <li>📆 Pay over time</li>
+            </ul>
+          </div>
+        ) : (
+          <div className="faq">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button
+                  className="faq-question"
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                >
+                  {faq.question}
+                  <span>{openIndex === index ? '−' : '+'}</span>
+                </button>
+                {openIndex === index && (
+                  <div className="faq-answer">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
