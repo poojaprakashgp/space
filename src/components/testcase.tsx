@@ -637,3 +637,103 @@ export default function SmartPayModal() {
 }
 
 
+
+
+
+
+
+
+.smartpay-modal {
+
+  
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-weight: 600;
+      font-size: 16px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        color: #000;
+  
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 30%;
+          right: 30%;
+          height: 3px;
+          background-color: #d31f27;
+          border-radius: 3px;
+        }
+      }
+    }
+  
+    .tab.active {
+      color: #000;
+  
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 30%;
+        right: 30%;
+        height: 3px;
+        background-color: #d31f27;
+        border-radius: 3px;
+      }
+    }
+  
+    .tab-content {
+      padding: 20px;
+      font-size: 15px;
+      color: #333;
+      line-height: 1.5;
+    }
+  
+    .faq-item {
+      border-top: 1px solid #eee;
+      padding: 16px 0;
+  
+      .faq-question {
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        padding: 0;
+        font-size: 15px;
+      }
+  
+      .faq-answer {
+        margin-top: 8px;
+        color: #555;
+        font-size: 14px;
+      }
+    }
+  
+    .close-button {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+  
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+
