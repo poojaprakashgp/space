@@ -169,3 +169,42 @@ export default function SmartPayModal() {
   color: #555;
   font-size: 14px;
 }
+
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #666;
+  position: relative;
+
+  &:hover {
+    color: #000;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 30%;
+      right: 30%;
+      height: 3px;
+      background: #d31f27; // same as active red underline
+    }
+  }
+}
+
+.active {
+  color: #000;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 30%;
+    right: 30%;
+    height: 3px;
+    background: #d31f27;
+  }
+}
