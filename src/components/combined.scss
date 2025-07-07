@@ -1,0 +1,220 @@
+/*PaymentOptionsPriceDetails.scss */
+.price-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .price-pre-text {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .price-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #222;
+  
+    .cent-text {
+      font-size: 12px;
+      vertical-align: super;
+      margin-left: 2px;
+    }
+  }
+  
+  .price-post-text {
+    font-size: 14px;
+    color: #888;
+  }
+
+
+/* PaymentOptionsPrice.scss */
+
+.payment-options__main-container {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .payment-options-modal__header {
+    font-family: "GalanoGrotesque-Bold", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: var(--base-line-height);
+  }
+  
+  .payment-options__box-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .payment-options__checkbox {
+    margin-top: 0.5rem;
+  }
+  
+  .payment-options__body-container {
+    flex: 1;
+  }
+  
+  .payment-options__body-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  .payment-options__body-content {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+  
+  .payment-options__image {
+    max-width: 80px;
+    height: auto;
+    margin-top: 0.5rem;
+  }
+  
+  .payment-options__offer {
+    color: black;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0;
+    border-bottom: 1px solid black;
+    border-radius: 0px;
+  }
+
+/*PaymentOptionsSmartPayModal.scss */
+  
+
+  
+  .smartpay-tabs {
+    margin-top: 12px;
+  }
+  
+  .about-container {
+    margin-bottom: 20px;
+  }
+  
+  .about-body {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .bullet {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  
+    .bullet-image {
+      margin-right: 10px;
+      width: 30px;
+      height: 30px;
+    }
+  
+    .bullet-item {
+      font-size: 14px;
+      color: #444;
+    }
+  }
+  
+  .faq-container {
+    margin-top: 16px;
+  }
+  
+  .accordion-list {
+    margin-top: 8px;
+    .faq-item {
+      border-top: 1px solid #eee;
+      padding: 16px 0;
+  
+      .faq-question {
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        padding: 0;
+        font-size: 15px;
+        color: black;
+      }
+      .flex-between {
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        padding: 0;
+        font-size: 15px;
+      }
+  
+      .faq-answer {
+        margin-top: 8px;
+        color: #555;
+        font-size: 14px;
+      }
+    }
+  }
+
+/*PaymentOptionsSmartPayTab.scss */
+
+.tabs-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .tabs-button-wrapper {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 16px;
+  }
+  
+  .tabs-button {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    width: 50%;
+    border-radius: 0px;
+  
+    &:focus {
+      outline: none;
+    }
+  
+    &.selected {
+      color: #000;
+      border-bottom: 4px solid #e00;
+      border-color: #e00;
+    }
+  }
+  
+  .tabs-label {
+    pointer-events: none;
+  }
+  
+  .tabs-content-wrapper {
+    &.has-children {
+      padding-top: 12px;
+    }
+  }
