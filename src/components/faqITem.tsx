@@ -114,3 +114,82 @@ describe('DeviceDetails', () => {
       at Object.<anonymous> (common/templates/Recommendation/PaymentOptions.tsx:13:69)
       at Object.<anonymous> (common/organisms/ProductDescription/Components/DeviceDetails/index.tsx:19:64)
       at Object.<anonymous> (common/organisms/ProductDescription/Components/DeviceDetails/test/DeviceDetails.test.tsx:46:16)
+
+
+
+
+
+// 👇 MOCK ICONS BEFORE ANYTHING ELSE
+jest.mock('@vds/core/icons/down-caret', () => ({
+  __esModule: true,
+  default: () => <div data-testid="mock-down-caret">▼</div>,
+}));
+
+jest.mock('@vds/core/icons/up-caret', () => ({
+  __esModule: true,
+  default: () => <div data-testid="mock-up-caret">▲</div>,
+}));
+
+// ✅ Then import React & rest of your app
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { DeviceDetails } from '../index';
+
+// Mock child components
+jest.mock('../components/ProductDetails', () => ({
+  ProductDetails: () => <div data-testid='ProductDetails'>ProductDetails</div>,
+}));
+jest.mock('../components/DevicePrice', () => ({
+  DevicePrice: () => <div data-testid='DevicePrice'>DevicePrice</div>,
+}));
+jest.mock('../components/Bestphone', () => ({
+  BestPhone: () => <div data-testid='BestPhone'>BestPhone</div>,
+}));
+
+describe('DeviceDetails', () => {
+  it('renders all mapped sections', () => {
+    const mockSection = [
+      { id: 'best_phone_for_you', someProp: 'foo' },
+      { id: 'device_title_price', someProp: 'bar' },
+      { id: 'product_details', someProp: 'baz' },
+    ];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    expect(screen.getByTestId('BestPhone')).toBeInTheDocument();
+    expect(screen.getByTestId('DevicePrice')).toBeInTheDocument();
+    expect(screen.getByTestId('ProductDetails')).toBeInTheDocument();
+  });
+
+  it('renders nothing for unknown section id', () => {
+    const mockSection = [{ id: 'unknown_section', someProp: 'foo' }];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing when no content is provided (default empty section array)', () => {
+    render(<DeviceDetails />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing when content is provided but section is undefined', () => {
+    render(<DeviceDetails content={{}} />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing when section item has null/undefined id', () => {
+    const mockSection = [
+      { id: null, someProp: 'foo' },
+      { id: undefined, someProp: 'bar' },
+    ];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
+  });
+});
+
