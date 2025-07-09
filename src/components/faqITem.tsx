@@ -1,85 +1,17 @@
 import React from 'react';
-import Button from '@/common/molecules/Button/Button';
-import DownCaret from '@vds/core/icons/down-caret';
-import UpCaret from '@vds/core/icons/up-caret';
+import { render, screen } from '@testing-library/react';
+import { DeviceDetails } from '../index';
 
-interface FaqItemProps {
-  title: string;
-  body: string;
-  index: number;
-  openIndex: number | null;
-  onToggle: (index: number) => void;
-}
-
-export default function FaqItem({
-  title,
-  body,
-  index,
-  openIndex,
-  onToggle,
-}: Readonly<FaqItemProps>) {
-  const isOpen = openIndex === index;
-  return (
-    <div className='faq-item'>
-      <Button
-        className='faq-question'
-        aria-expanded={isOpen}
-        aria-controls={`faq-answer-${index}`}
-        ariaLabel={title}
-        label={
-          <span className='flex-between'>
-            {title}{' '}
-            <span>
-              {isOpen ? <UpCaret /> : <DownCaret ariaHidden={true} />}
-            </span>
-          </span>
-        }
-        onClick={() => onToggle(index)}
-        size='medium'
-      />
-      <div
-        id={`faq-answer-${index}`}
-        role='region'
-        aria-labelledby={`faq-question-${index}`}
-        className='faq-answer'
-        hidden={!isOpen}
-        aria-hidden={!isOpen}
-      >
-        {body}
-      </div>
-    </div>
-  );
-}
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import FaqItem from '../FaqItem';
-import '@testing-library/jest-dom';
-
-// Don't mock the FaqItem component itself, let it render normally
-// Only mock its dependencies
-jest.mock('@/common/molecules/Button/Button', () => {
-  return {
-    __esModule: true,
-    default: ({ label, onClick, ariaLabel, 'aria-expanded': ariaExpanded, 'aria-controls': ariaControls }) => (
-      <button 
-        data-testid="mock-button" 
-        aria-label={ariaLabel}
-        aria-expanded={ariaExpanded}
-        aria-controls={ariaControls}
-        id={`faq-question-${ariaLabel === 'FAQ Question' ? '1' : '0'}`}
-        onClick={onClick}
-      >
-        {typeof label === 'string' ? label : (
-          <>
-            {label.props.children[0]}{' '}
-            {label.props.children[2]}
-          </>
-        )}
-      </button>
-    )
-  };
-});
-
+// Mock child components
+jest.mock('../components/ProductDetails', () => ({
+  ProductDetails: () => <div data-testid='ProductDetails'>ProductDetails</div>,
+}));
+jest.mock('../components/DevicePrice', () => ({
+  DevicePrice: () => <div data-testid='DevicePrice'>DevicePrice</div>,
+}));
+jest.mock('../components/Bestphone', () => ({
+  BestPhone: () => <div data-testid='BestPhone'>BestPhone</div>,
+}));
 jest.mock('@vds/core/icons/down-caret', () => {
   return {
     __esModule: true,
@@ -94,203 +26,91 @@ jest.mock('@vds/core/icons/up-caret', () => {
   };
 });
 
-describe('FaqItem Component', () => {
-  const mockOnToggle = jest.fn();
-  
-  const mockProps = {
-    title: 'FAQ Question',
-    body: 'This is the answer to the FAQ question',
-    index: 1,
-    openIndex: null,
-    onToggle: mockOnToggle
-  };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+describe('DeviceDetails', () => {
+  it('renders all mapped sections', () => {
+    const mockSection = [
+      { id: 'best_phone_for_you', someProp: 'foo' },
+      { id: 'device_title_price', someProp: 'bar' },
+      { id: 'product_details', someProp: 'baz' },
+    ];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    expect(screen.getByTestId('BestPhone')).toBeInTheDocument();
+    expect(screen.getByTestId('DevicePrice')).toBeInTheDocument();
+    expect(screen.getByTestId('ProductDetails')).toBeInTheDocument();
   });
 
-  it('renders the component in closed state by default', () => {
-    render(<FaqItem {...mockProps} />);
-    
-    // Button should be rendered with question text
-    const button = screen.getByTestId('mock-button');
-    expect(button).toBeInTheDocument();
-    
-    // Answer should be hidden
-    const answer = screen.getByRole('region');
-    expect(answer).toHaveAttribute('hidden');
-    expect(answer).toHaveAttribute('aria-hidden', 'true');
-    
-    // Should find the down caret in the DOM
-    expect(screen.getByTestId('down-caret-icon')).toBeInTheDocument();
+  it('renders nothing for unknown section id', () => {
+    const mockSection = [{ id: 'unknown_section', someProp: 'foo' }];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    // Should not find any of the known test ids
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
   });
 
-  it('renders the component in open state when index matches openIndex', () => {
-    const openProps = {
-      ...mockProps,
-      openIndex: 1 // Matches the index 1
-    };
-    
-    render(<FaqItem {...openProps} />);
-    
-    // Button should be rendered
-    const button = screen.getByTestId('mock-button');
-    expect(button).toHaveAttribute('aria-expanded', 'true');
-    
-    // Answer should be visible
-    const answer = screen.getByRole('region');
-    expect(answer).not.toHaveAttribute('hidden');
-    expect(answer).toHaveAttribute('aria-hidden', 'false');
-    
-    // Up caret should be displayed when open
-    expect(screen.getByTestId('up-caret-icon')).toBeInTheDocument();
+  it('renders nothing when no content is provided (default empty section array)', () => {
+    render(<DeviceDetails />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
   });
 
-  it('calls onToggle with the correct index when clicked', () => {
-    render(<FaqItem {...mockProps} />);
-    
-    // Click on the button
-    fireEvent.click(screen.getByTestId('mock-button'));
-    
-    // onToggle should be called with the index
-    expect(mockOnToggle).toHaveBeenCalledWith(1);
+  it('renders nothing when content is provided but section is undefined (fallback to empty array)', () => {
+    render(<DeviceDetails content={{}} />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
   });
 
-  it('displays the correct title and body content', () => {
-    render(<FaqItem {...mockProps} />);
-    
-    // Button should contain the title
-    expect(screen.getByTestId('mock-button')).toHaveTextContent('FAQ Question');
-    
-    // Region should contain the answer text
-    const answer = screen.getByRole('region');
-    expect(answer).toHaveTextContent('This is the answer to the FAQ question');
-    
-    // Check that the region has the correct accessibility attributes
-    expect(answer).toHaveAttribute('id', 'faq-answer-1');
-    expect(answer).toHaveAttribute('aria-labelledby', 'faq-question-1');
-  });
-}); in the above test file first and last test case are failing please fix it
-
-
-
-
-
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import FaqItem from '../FaqItem';
-import '@testing-library/jest-dom';
-
-jest.mock('@/common/molecules/Button/Button', () => {
-  return {
-    __esModule: true,
-    default: ({
-      label,
-      onClick,
-      ariaLabel,
-      'aria-expanded': ariaExpanded,
-      'aria-controls': ariaControls,
-    }) => (
-      <button
-        data-testid="mock-button"
-        aria-label={ariaLabel}
-        aria-expanded={ariaExpanded}
-        aria-controls={ariaControls}
-        id={`faq-question-${ariaLabel === 'FAQ Question' ? '1' : '0'}`}
-        onClick={onClick}
-      >
-        {typeof label === 'string' ? label : (
-          <>
-            {label.props.children[0]}{' '}
-            {label.props.children[2]}
-          </>
-        )}
-      </button>
-    ),
-  };
-});
-
-jest.mock('@vds/core/icons/down-caret', () => {
-  return {
-    __esModule: true,
-    default: ({ ariaHidden }) => (
-      <div data-testid="down-caret-icon" aria-hidden={ariaHidden}>▼</div>
-    ),
-  };
-});
-
-jest.mock('@vds/core/icons/up-caret', () => {
-  return {
-    __esModule: true,
-    default: () => (
-      <div data-testid="up-caret-icon">▲</div>
-    ),
-  };
-});
-
-describe('FaqItem Component', () => {
-  const mockOnToggle = jest.fn();
-
-  const mockProps = {
-    title: 'FAQ Question',
-    body: 'This is the answer to the FAQ question',
-    index: 1,
-    openIndex: null,
-    onToggle: mockOnToggle,
-  };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders the component in closed state by default', () => {
-    render(<FaqItem {...mockProps} />);
-
-    const button = screen.getByTestId('mock-button');
-    expect(button).toBeInTheDocument();
-
-    // Use querySelector for hidden region
-    const answer = document.querySelector('#faq-answer-1');
-    expect(answer).toHaveAttribute('hidden');
-    expect(answer).toHaveAttribute('aria-hidden', 'true');
-
-    expect(screen.getByTestId('down-caret-icon')).toBeInTheDocument();
-  });
-
-  it('renders the component in open state when index matches openIndex', () => {
-    const openProps = {
-      ...mockProps,
-      openIndex: 1,
-    };
-
-    render(<FaqItem {...openProps} />);
-
-    const button = screen.getByTestId('mock-button');
-    expect(button).toHaveAttribute('aria-expanded', 'true');
-
-    const answer = screen.getByRole('region');
-    expect(answer).not.toHaveAttribute('hidden');
-    expect(answer).toHaveAttribute('aria-hidden', 'false');
-
-    expect(screen.getByTestId('up-caret-icon')).toBeInTheDocument();
-  });
-
-  it('calls onToggle with the correct index when clicked', () => {
-    render(<FaqItem {...mockProps} />);
-
-    fireEvent.click(screen.getByTestId('mock-button'));
-    expect(mockOnToggle).toHaveBeenCalledWith(1);
-  });
-
-  it('displays the correct title and body content', () => {
-    render(<FaqItem {...mockProps} />);
-
-    const button = screen.getByTestId('mock-button');
-    expect(button).toHaveTextContent('FAQ Question');
-
-    const answer = document.querySelector('#faq-answer-1');
-    expect(answer).toHaveTextContent('This is the answer to the FAQ question');
-    expect(answer).toHaveAttribute('id', 'faq-answer-1');
-    expect(answer).toHaveAttribute('aria-labelledby', 'faq-question-1');
+  it('renders nothing when section item has null/undefined id (fallback to empty string key)', () => {
+    const mockSection = [
+      { id: null, someProp: 'foo' },
+      { id: undefined, someProp: 'bar' },
+    ];
+    render(<DeviceDetails content={{ section: mockSection }} />);
+    expect(screen.queryByTestId('BestPhone')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('DevicePrice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ProductDetails')).not.toBeInTheDocument();
   });
 });
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    C:\Users\pplepo\Desktop\VProject\onevz-value-digital-mfe-shop\node_modules\@vds\core\icons\warning\index.js:7
+    import IconBase from '../icon-base';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      12 |   className?: string;
+      13 |   closeModal: () => void;
+    > 14 |   show: boolean;
+         |                                     ^
+      15 |   showClose?: boolean;
+      16 |   modalTitle?: string | React.ReactNode;
+      17 |   titleClassName?: string;
+
+      at Runtime.createScriptFromCode (node_modules/jest-runtime/build/index.js:1505:14)
+      at Object.<anonymous> (common/molecules/Modal/Modal.tsx:14:57)
+      at Object.<anonymous> (common/templates/Recommendation/PaymentOptionsPrice.tsx:16:16)
+      at Object.<anonymous> (common/templates/Recommendation/PaymentOptions.tsx:13:69)
+      at Object.<anonymous> (common/organisms/ProductDescription/Components/DeviceDetails/index.tsx:19:64)
+      at Object.<anonymous> (common/organisms/ProductDescription/Components/DeviceDetails/test/DeviceDetails.test.tsx:46:16)
