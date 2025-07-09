@@ -171,3 +171,126 @@ describe('FaqItem Component', () => {
     expect(answer).toHaveAttribute('aria-labelledby', 'faq-question-1');
   });
 }); in the above test file first and last test case are failing please fix it
+
+
+
+
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import FaqItem from '../FaqItem';
+import '@testing-library/jest-dom';
+
+jest.mock('@/common/molecules/Button/Button', () => {
+  return {
+    __esModule: true,
+    default: ({
+      label,
+      onClick,
+      ariaLabel,
+      'aria-expanded': ariaExpanded,
+      'aria-controls': ariaControls,
+    }) => (
+      <button
+        data-testid="mock-button"
+        aria-label={ariaLabel}
+        aria-expanded={ariaExpanded}
+        aria-controls={ariaControls}
+        id={`faq-question-${ariaLabel === 'FAQ Question' ? '1' : '0'}`}
+        onClick={onClick}
+      >
+        {typeof label === 'string' ? label : (
+          <>
+            {label.props.children[0]}{' '}
+            {label.props.children[2]}
+          </>
+        )}
+      </button>
+    ),
+  };
+});
+
+jest.mock('@vds/core/icons/down-caret', () => {
+  return {
+    __esModule: true,
+    default: ({ ariaHidden }) => (
+      <div data-testid="down-caret-icon" aria-hidden={ariaHidden}>▼</div>
+    ),
+  };
+});
+
+jest.mock('@vds/core/icons/up-caret', () => {
+  return {
+    __esModule: true,
+    default: () => (
+      <div data-testid="up-caret-icon">▲</div>
+    ),
+  };
+});
+
+describe('FaqItem Component', () => {
+  const mockOnToggle = jest.fn();
+
+  const mockProps = {
+    title: 'FAQ Question',
+    body: 'This is the answer to the FAQ question',
+    index: 1,
+    openIndex: null,
+    onToggle: mockOnToggle,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the component in closed state by default', () => {
+    render(<FaqItem {...mockProps} />);
+
+    const button = screen.getByTestId('mock-button');
+    expect(button).toBeInTheDocument();
+
+    // Use querySelector for hidden region
+    const answer = document.querySelector('#faq-answer-1');
+    expect(answer).toHaveAttribute('hidden');
+    expect(answer).toHaveAttribute('aria-hidden', 'true');
+
+    expect(screen.getByTestId('down-caret-icon')).toBeInTheDocument();
+  });
+
+  it('renders the component in open state when index matches openIndex', () => {
+    const openProps = {
+      ...mockProps,
+      openIndex: 1,
+    };
+
+    render(<FaqItem {...openProps} />);
+
+    const button = screen.getByTestId('mock-button');
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    const answer = screen.getByRole('region');
+    expect(answer).not.toHaveAttribute('hidden');
+    expect(answer).toHaveAttribute('aria-hidden', 'false');
+
+    expect(screen.getByTestId('up-caret-icon')).toBeInTheDocument();
+  });
+
+  it('calls onToggle with the correct index when clicked', () => {
+    render(<FaqItem {...mockProps} />);
+
+    fireEvent.click(screen.getByTestId('mock-button'));
+    expect(mockOnToggle).toHaveBeenCalledWith(1);
+  });
+
+  it('displays the correct title and body content', () => {
+    render(<FaqItem {...mockProps} />);
+
+    const button = screen.getByTestId('mock-button');
+    expect(button).toHaveTextContent('FAQ Question');
+
+    const answer = document.querySelector('#faq-answer-1');
+    expect(answer).toHaveTextContent('This is the answer to the FAQ question');
+    expect(answer).toHaveAttribute('id', 'faq-answer-1');
+    expect(answer).toHaveAttribute('aria-labelledby', 'faq-question-1');
+  });
+});
