@@ -80,4 +80,4 @@ Visible, non-interactive elements with click handlers must have at least one key
     {PaymentOptionsPriceDetails(id, price, SKUs, selectedSKUId)}
   </div>
 </div>
-
+Use <input type="button">, <input type="image">, <input type="reset">, <input type="submit">, or <button> instead of the "button" role to ensure accessibility across all devices.s
