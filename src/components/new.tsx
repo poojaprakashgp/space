@@ -1,55 +1,60 @@
-  const removeLeasePlan = async () => {
-    setOrderSummaryLoader(true);
 
-    const parsedDeviceDetails = JSON.parse(
-      sessionStorage.getItem('deviceDetails') ?? '{}',
-    );
-    parsedDeviceDetails['devicePayment'] = 'retail';
-    updateSessionStorage('deviceDetails', false, parsedDeviceDetails);
+    it('handles veriff price when veriffPrice is empty string', () => {
+      const modifiedOptions = [...mockPaymentOptions];
+      modifiedOptions[2] = {
+        ...modifiedOptions[2],
+        price: {
+          ...modifiedOptions[2].price!,
+          veriffPrice: '',
+        },
+      };
 
-    const summary = await removeSmartPayLeasePlan(subDomain);
-    updateOrderSummary(summary);
+      const modifiedContent = [
+        {
+          ...mockDeviceDetailsContent[0],
+          content: {
+            section: [{ options: modifiedOptions }],
+          },
+        },
+      ];
 
-    setOrderSummaryLoader(false);
-  };
-cover this function which is called from other component after click of button with data-testid="remove lease"
+      render(
+        <ChoosePayment
+          {...defaultProps}
+          DEVICE_DETAILS_CONTENT_SECTION={modifiedContent}
+        />
+      );
 
-
-
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ComponentA from './ComponentA';
-
-// Mock the dependent functions
-jest.mock('../utils/session', () => ({
-  updateSessionStorage: jest.fn(),
-}));
-
-jest.mock('../api', () => ({
-  removeSmartPayLeasePlan: jest.fn(() => Promise.resolve({ summaryData: 'mockSummary' })),
-}));
-
-describe('ComponentA', () => {
-  beforeEach(() => {
-    sessionStorage.setItem('deviceDetails', JSON.stringify({ some: 'data' }));
-  });
-
-  test('covers removeLeasePlan when button is clicked', async () => {
-    render(<ComponentA />);
-
-    const button = screen.getByTestId('remove-lease');
-    fireEvent.click(button); // 👈 This triggers `removeLeasePlan`
-
-    await waitFor(() => {
-      // assert or just wait to ensure async completes
-      // or verify side effect, e.g. that a mock was called
-      expect(screen.queryByTestId('remove-lease')).toBeInTheDocument();
+      // Should default to 0 when veriffPrice is empty
+      expect(screen.getByText('$0')).toBeInTheDocument();
     });
-  });
-});
 
-expect(updateSessionStorage).toHaveBeenCalledWith('deviceDetails', false, {
-  some: 'data',
-  devicePayment: 'retail',
-});
 
-expect(removeSmartPayLeasePlan).toHaveBeenCalledWith(expect.anything());
+ ChoosePayment › ChoosePaymentSelection Component › handles veriff price when veriffPrice is empty string
+
+    Found multiple elements with the text: $0
+
+    Here are the matching elements:
+
+    The detailed error message is suppressed by waitFor
+
+    The detailed error message is suppressed by waitFor
+
+    The detailed error message is suppressed by waitFor
+
+    (If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+      263 |
+      264 |       // Should default to 0 when veriffPrice is empty
+    > 265 |       expect(screen.getByText('$0')).toBeInTheDocument();
+          |                     ^
+      266 |     });
+      267 |   });
+      268 |
+
+      at Object.getElementError (node_modules/@evinced/unit-tester/dist/index.js:41:1501782)
+      at getElementError (node_modules/@testing-library/dom/dist/query-helpers.js:20:35)
+      at getMultipleElementsFoundError (node_modules/@testing-library/dom/dist/query-helpers.js:23:10)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByText (common/organisms/ProductDescription/Components/DeviceDetails/components/test/ChoosePayment.test.tsx:265:21)
