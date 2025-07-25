@@ -1,38 +1,26 @@
 <div className='number-selection__actions'>
-            <Button
-              primary={true}
-              label={loading ? 'Processing...' : 'Continue'}
-              onClick={handleSubmit}
-              disabled={isContinueDisabled()}
-              className='number-selection__continue-btn'
-              data-testid='continue-button'
-              size='xl'
-              dataGtmCta='continue_number_selection'
-            />
-            {verificationCodeSuccess && greatDealSelected && (
-              <Button
-                label='Skip'
-                onClick={handleSkip}
-                className='number-selection__continue-btn'
-                data-testid='continue-button'
-                size='xl'
-                dataGtmCta='continue_number_selection'
-              />
-            )}
-          </div>
+  {ctas.map((cta, index) => {
+    const isPrimary = cta.style === 'primary';
+    const isDisabled = cta.text === 'Continue' ? isContinueDisabled() : false;
+    const isLoading = cta.text === 'Continue' && loading;
+    const shouldRender =
+      cta.text === 'Continue' ||
+      (cta.text === 'Skip' && verificationCodeSuccess && greatDealSelected);
 
+    if (!shouldRender) return null;
 
-"ctas": [
-                            	{
-                              	"text": "Continue",
-                              	"type": "button",
-                              	"style": "primary",
-                              	"action": "native"
-                            	},
-                            	{
-                              	"text": "Skip",
-                              	"type": "button",
-                              	"style": "secondary",
-                              	"action": "native"
-                            	}
-                          	],
+    return (
+      <Button
+        key={index}
+        primary={isPrimary}
+        label={isLoading ? 'Processing...' : cta.text}
+        onClick={cta.text === 'Continue' ? handleSubmit : handleSkip}
+        disabled={isDisabled}
+        className='number-selection__continue-btn'
+        data-testid='continue-button'
+        size='xl'
+        dataGtmCta={`continue_number_selection_${cta.text.toLowerCase()}`}
+      />
+    );
+  })}
+</div>
