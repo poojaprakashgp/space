@@ -1,210 +1,165 @@
-/* eslint-disable react/display-name */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ProductDescription from '../productDescription';
-import { usePdpContext } from '@/store/contexts/conversationalAI/pdpContext';
-import { fetchCityStateDetailFromZipCode } from '@/store/sagas/clientApis/conversationalAI/mapquest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { useFeatureFlag } from '@/store/contexts/featureFlagContext';
+import ChoosePayment from './ChoosePayment';
 
-jest.mock('@/store/contexts/conversationalAI/pdpContext', () => ({
-  usePdpContext: jest.fn(),
-}));
-
-jest.mock('@/common/molecules/UpdateZipCode/UpdateZipCode', () => (props) => (
-  <div data-testid="update-zip-code-modal">
-    <button data-testid="close-zip-modal" onClick={() => props.closeModal('12345')}>Close</button>
-    UpdateZipCodeMock
-  </div>
-));
-
-jest.mock('../../MarketAvailabilityModal/MarketAvailabilityModal', () => (props) => (
-  <div data-testid="market-availability-modal">
-    <button onClick={props.onModalClose} data-testid="close-market-modal">Close</button>
-    MarketAvailabilityModalMock
-  </div>
-));
-
-jest.mock('@vds/core/icons/warning', () => {
-  const Warning = (props) => <div data-testid="warning-icon" {...props} />;
-  Warning.displayName = 'Warning';
-  return Warning;
+const mockOption = (id, title = 'Option', body = 'Body', image = null, discountedPrice = '50') => ({
+  id,
+  title,
+  body,
+  price: {
+    preText: 'Pre',
+    fullPrice: '100',
+    postText: 'Post',
+    veriffPrice: '30',
+    discountedPrice,
+  },
+  image,
 });
 
-jest.mock('@/store/sagas/clientApis/conversationalAI/marketAvailability', () => ({
-  marketAvailability: jest.fn(),
-}));
+describe('ChoosePayment Component', () => {
+  const setup = (optionsLength = 2) => {
+    const options = Array.from({ length: optionsLength }, (_, i) =>
+      mockOption(`option_${i}`, `Option ${i + 1}`),
+    );
 
-jest.mock('@/store/sagas/clientApis/conversationalAI/mapquest', () => ({
-  fetchCityStateDetailFromZipCode: jest.fn(),
-}));
-
-jest.mock('../Components/DeviceDetails/index', () => ({
-  DeviceDetails: (props) => <div data-testid="device-details">DeviceDetailsMock</div>,
-}));
-
-jest.mock('@/store/contexts/featureFlagContext', () => ({
-  useFeatureFlag: jest.fn(),
-}));
-
-jest.mock('@/common/molecules/Button/Button', () => (props) => (
-  <button {...props}>{props.label || 'Button'}</button>
-));
-
-jest.mock('@/components/Navigation/common/helper/navigationTopUpdateZipModal', () => ({
-  navigationTopUpdateZipModal: { testdomain: { title: 'Test Modal' } },
-}));
-
-describe('ProductDescription', () => {
-  const defaultProps = {
-    handleChooseClick: jest.fn(),
-    descriptionData: {
-      content: {
-        section: [
-          {
-            id: 'device_details',
-            content: {
-              section: [
-                {
-                  id: 'device_title_price',
-                  price: { fullPrice: '$100.00', discountedPrice: '$80.00' },
-                  title: 'Test Device',
-                  content: { section: [], type: 'device_title_price_section' },
-                },
-              ],
+    const DEVICE_DETAILS_CONTENT_SECTION = [
+      {
+        id: 'choose_payment_option',
+        title: 'Choose your payment',
+        content: {
+          section: [
+            {
+              options,
             },
-            cta: { text: 'Choose', destination: '', style: '', type: '' },
-          },
-        ],
-      },
-    },
-    productId: 'prod1',
-    SKUs: [{ status: 'Available', id: 'sku1' }],
-    selectedSkuId: 'sku1',
-    setLoading: jest.fn(),
-  };
-
-  beforeEach(() => {
-    useFeatureFlag.mockReturnValue({
-      featureFlags: {
-        ShopCfgProfile: {
-          enableVeriffPortInFFlag: false,
-          enableSmartPayFFlag: false,
+          ],
         },
       },
-    });
+      {
+        id: 'coupon_exclusions',
+        title: 'Coupon Exclusions',
+        cta: { text: 'Learn More' },
+        modal: {
+          title: 'Coupon Modal',
+          content: { type: 'DOT_LIST', section: [{ title: 'Exclusion Item' }] },
+          footer: { title: 'Footer text' },
+        },
+      },
+    ];
 
-    usePdpContext.mockReturnValue({
-      subDomain: 'testdomain',
-      pdpDevice: 'testDevice',
-    });
+    const mockSetSelected = jest.fn();
 
-    localStorage.setItem('addressDetails', JSON.stringify({ zip_code: '12345' }));
-    sessionStorage.setItem('cart', JSON.stringify([]));
+    render(
+      <ChoosePayment
+        fullPrice={999}
+        selectedPaymentOption={''}
+        setSelectedPaymentOption={mockSetSelected}
+        DEVICE_DETAILS_CONTENT_SECTION={DEVICE_DETAILS_CONTENT_SECTION}
+      />,
+    );
 
-    const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
-    marketAvailability.mockResolvedValue(true);
+    return { mockSetSelected };
+  };
 
-    fetchCityStateDetailFromZipCode.mockResolvedValue({
-      zip_code: '12345',
-      city: 'TestCity',
-      state: 'TS',
-      error: false,
-    });
+  test('renders section title and coupon exclusions', () => {
+    setup(2);
+    expect(screen.getByText('Choose your payment')).toBeInTheDocument();
+    expect(screen.getByText('Coupon Exclusions')).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-    jest.clearAllMocks();
+  test('renders payment options without accordion when <= 2 options', () => {
+    setup(2);
+    expect(screen.getByText('Option 1')).toBeInTheDocument();
+    expect(screen.getByText('Option 2')).toBeInTheDocument();
+    expect(screen.queryByText('See other payment options')).not.toBeInTheDocument();
   });
 
-  it('renders device details and choose button', () => {
-    render(<ProductDescription {...defaultProps} />);
-    expect(screen.getByTestId('device-details')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /choose/i })).toBeInTheDocument();
+  test('renders first option and accordion when > 2 options', () => {
+    setup(4);
+    expect(screen.getByText('Option 1')).toBeInTheDocument();
+    expect(screen.getByText('See other payment options')).toBeInTheDocument();
+    expect(screen.queryByText('Option 2')).not.toBeVisible();
   });
 
-  it('opens UpdateZipCode modal if no zip code is present', async () => {
-    localStorage.removeItem('addressDetails');
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
-    expect(await screen.findByTestId('update-zip-code-modal')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('close-zip-modal'));
-    await waitFor(() => {
-      expect(screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument();
-    });
+  test('accordion expands and shows other options', () => {
+    setup(4);
+    fireEvent.click(screen.getByText('See other payment options'));
+    expect(screen.getByText('Option 2')).toBeInTheDocument();
+    expect(screen.getByText('Option 3')).toBeInTheDocument();
+    expect(screen.getByText('Option 4')).toBeInTheDocument();
   });
 
-  it('shows MarketAvailability modal if entered zip is unserviceable', async () => {
-    localStorage.removeItem('addressDetails');
-    const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
-    marketAvailability.mockResolvedValue(false);
-
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
-    fireEvent.click(await screen.findByTestId('close-zip-modal'));
-
-    expect(await screen.findByTestId('market-availability-modal')).toBeInTheDocument();
+  test('handles selection state correctly', () => {
+    const { mockSetSelected } = setup(2);
+    fireEvent.click(screen.getByText('Option 1'));
+    expect(mockSetSelected).toHaveBeenCalledWith('Option 1');
   });
 
-  it('calls handleChooseClick if market is available', async () => {
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
+  test('renders CTA button inside payment option if present', () => {
+    const optionWithCTA = mockOption('cta_option', 'CTA Option');
+    optionWithCTA.cta = { text: 'More Info' };
 
-    await waitFor(() => {
-      expect(defaultProps.handleChooseClick).toHaveBeenCalledWith(
-        'prod1', '$80.00', 100, 'Test Device', 'sku1', '12345', ''
-      );
-    });
+    const DEVICE_DETAILS_CONTENT_SECTION = [
+      {
+        id: 'choose_payment_option',
+        title: 'Choose your payment',
+        content: {
+          section: [
+            {
+              options: [optionWithCTA],
+            },
+          ],
+        },
+      },
+    ];
+
+    render(
+      <ChoosePayment
+        fullPrice={1000}
+        selectedPaymentOption={''}
+        setSelectedPaymentOption={jest.fn()}
+        DEVICE_DETAILS_CONTENT_SECTION={DEVICE_DETAILS_CONTENT_SECTION}
+      />,
+    );
+
+    expect(screen.getByText('More Info')).toBeInTheDocument();
   });
 
-  it('disables choose button if no available SKUs', () => {
-    render(<ProductDescription {...defaultProps} SKUs={[]} />);
-    expect(screen.getByRole('button', { name: /choose/i })).toBeDisabled();
-  });
+  test('shows modal content when CTA is clicked', () => {
+    const optionWithModal = mockOption('modal_option', 'Modal Option');
+    optionWithModal.cta = { text: 'Details' };
+    optionWithModal.modal = {
+      title: 'Modal Title',
+      content: { type: 'DOT_LIST', section: [{ title: 'Feature 1' }] },
+      footer: { title: 'Footer' },
+    };
 
-  it('shows and closes MarketAvailabilityModal correctly', async () => {
-    const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
-    marketAvailability.mockResolvedValue(false);
+    const DEVICE_DETAILS_CONTENT_SECTION = [
+      {
+        id: 'choose_payment_option',
+        title: 'Choose your payment',
+        content: {
+          section: [
+            {
+              options: [optionWithModal],
+            },
+          ],
+        },
+      },
+    ];
 
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
+    render(
+      <ChoosePayment
+        fullPrice={1000}
+        selectedPaymentOption={''}
+        setSelectedPaymentOption={jest.fn()}
+        DEVICE_DETAILS_CONTENT_SECTION={DEVICE_DETAILS_CONTENT_SECTION}
+      />,
+    );
 
-    expect(await screen.findByTestId('market-availability-modal')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('close-market-modal'));
-    await waitFor(() => {
-      expect(screen.queryByTestId('market-availability-modal')).not.toBeInTheDocument();
-    });
-  });
-
-  it('does not show MarketAvailabilityModal if zip is invalid', async () => {
-    const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
-    marketAvailability.mockResolvedValue(false);
-    fetchCityStateDetailFromZipCode.mockResolvedValue({ error: true });
-
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('market-availability-modal')).not.toBeInTheDocument();
-    });
-  });
-
-  it('handles edge case zip input and modals gracefully', async () => {
-    sessionStorage.removeItem('cart');
-    localStorage.removeItem('addressDetails');
-
-    render(<ProductDescription {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /choose/i }));
-
-    expect(await screen.findByTestId('update-zip-code-modal')).toBeInTheDocument();
-
-    localStorage.setItem('addressDetails', JSON.stringify({ zip_code: '12345' }));
-    fireEvent.click(screen.getByTestId('close-zip-modal'));
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByText('Details'));
+    expect(screen.getByText('Modal Title')).toBeInTheDocument();
+    expect(screen.getByText('Feature 1')).toBeInTheDocument();
+    expect(screen.getByText('Footer')).toBeInTheDocument();
   });
 });
