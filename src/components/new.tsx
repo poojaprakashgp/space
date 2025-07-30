@@ -1,58 +1,53 @@
+/* eslint-disable react/display-name */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProductDescription from '../productDescription';
 import { usePdpContext } from '@/store/contexts/conversationalAI/pdpContext';
 import { fetchCityStateDetailFromZipCode } from '@/store/sagas/clientApis/conversationalAI/mapquest';
+import '@testing-library/jest-dom';
 import { useFeatureFlag } from '@/store/contexts/featureFlagContext';
 
 jest.mock('@/store/contexts/conversationalAI/pdpContext', () => ({
   usePdpContext: jest.fn(),
 }));
 
-jest.mock('@/common/molecules/UpdateZipCode/UpdateZipCode', () => (props: any) => (
-  <div data-testid='update-zip-code-modal' {...props}>
-    <button data-testid='close-zip-modal' onClick={() => props.closeModal('12345')}>Close</button>
+jest.mock('@/common/molecules/UpdateZipCode/UpdateZipCode', () => (props) => (
+  <div data-testid="update-zip-code-modal">
+    <button data-testid="close-zip-modal" onClick={() => props.closeModal('12345')}>Close</button>
     UpdateZipCodeMock
   </div>
 ));
 
-jest.mock('../../MarketAvailabilityModal/MarketAvailabilityModal', () => (props: any) => (
-  <div data-testid='market-availability-modal' {...props}>
-    <button onClick={props.onModalClose} data-testid='close-market-modal'>Close</button>
+jest.mock('../../MarketAvailabilityModal/MarketAvailabilityModal', () => (props) => (
+  <div data-testid="market-availability-modal">
+    <button onClick={props.onModalClose} data-testid="close-market-modal">Close</button>
     MarketAvailabilityModalMock
   </div>
 ));
 
 jest.mock('@vds/core/icons/warning', () => {
-  const Warning = (props: any) => <div data-testid="warning-icon" {...props} />;
+  const Warning = (props) => <div data-testid="warning-icon" {...props} />;
   Warning.displayName = 'Warning';
   return Warning;
 });
 
 jest.mock('@/store/sagas/clientApis/conversationalAI/marketAvailability', () => ({
-  marketAvailability: jest.fn().mockResolvedValue(true),
+  marketAvailability: jest.fn(),
 }));
 
 jest.mock('@/store/sagas/clientApis/conversationalAI/mapquest', () => ({
-  fetchCityStateDetailFromZipCode: jest.fn().mockResolvedValue({
-    zip_code: '12345',
-    city: 'TestCity',
-    state: 'TS',
-    error: false,
-  }),
+  fetchCityStateDetailFromZipCode: jest.fn(),
 }));
 
 jest.mock('../Components/DeviceDetails/index', () => ({
-  DeviceDetails: (props: any) => (
-    <div data-testid="device-details" {...props}>DeviceDetailsMock</div>
-  ),
+  DeviceDetails: (props) => <div data-testid="device-details">DeviceDetailsMock</div>,
 }));
 
 jest.mock('@/store/contexts/featureFlagContext', () => ({
   useFeatureFlag: jest.fn(),
 }));
 
-jest.mock('@/common/molecules/Button/Button', () => (props: any) => (
+jest.mock('@/common/molecules/Button/Button', () => (props) => (
   <button {...props}>{props.label || 'Button'}</button>
 ));
 
@@ -90,7 +85,7 @@ describe('ProductDescription', () => {
   };
 
   beforeEach(() => {
-    (useFeatureFlag as jest.Mock).mockReturnValue({
+    useFeatureFlag.mockReturnValue({
       featureFlags: {
         ShopCfgProfile: {
           enableVeriffPortInFFlag: false,
@@ -99,13 +94,23 @@ describe('ProductDescription', () => {
       },
     });
 
-    (usePdpContext as jest.Mock).mockReturnValue({
+    usePdpContext.mockReturnValue({
       subDomain: 'testdomain',
       pdpDevice: 'testDevice',
     });
 
     localStorage.setItem('addressDetails', JSON.stringify({ zip_code: '12345' }));
     sessionStorage.setItem('cart', JSON.stringify([]));
+
+    const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
+    marketAvailability.mockResolvedValue(true);
+
+    fetchCityStateDetailFromZipCode.mockResolvedValue({
+      zip_code: '12345',
+      city: 'TestCity',
+      state: 'TS',
+      error: false,
+    });
   });
 
   afterEach(() => {
@@ -126,10 +131,12 @@ describe('ProductDescription', () => {
     fireEvent.click(screen.getByRole('button', { name: /choose/i }));
     expect(await screen.findByTestId('update-zip-code-modal')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('close-zip-modal'));
-    expect(await screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument();
+    });
   });
 
-  it('shows MarketAvailabilityModal if entered zip is unserviceable', async () => {
+  it('shows MarketAvailability modal if entered zip is unserviceable', async () => {
     localStorage.removeItem('addressDetails');
     const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
     marketAvailability.mockResolvedValue(false);
@@ -145,20 +152,14 @@ describe('ProductDescription', () => {
     render(<ProductDescription {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /choose/i }));
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(defaultProps.handleChooseClick).toHaveBeenCalledWith(
-        'prod1',
-        '$80.00',
-        100,
-        'Test Device',
-        'sku1',
-        '12345',
-        ''
-      )
-    );
+        'prod1', '$80.00', 100, 'Test Device', 'sku1', '12345', ''
+      );
+    });
   });
 
-  it('disables choose button if no SKUs', () => {
+  it('disables choose button if no available SKUs', () => {
     render(<ProductDescription {...defaultProps} SKUs={[]} />);
     expect(screen.getByRole('button', { name: /choose/i })).toBeDisabled();
   });
@@ -172,15 +173,15 @@ describe('ProductDescription', () => {
 
     expect(await screen.findByTestId('market-availability-modal')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('close-market-modal'));
-    await waitFor(() =>
-      expect(screen.queryByTestId('market-availability-modal')).not.toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(screen.queryByTestId('market-availability-modal')).not.toBeInTheDocument();
+    });
   });
 
   it('does not show MarketAvailabilityModal if zip is invalid', async () => {
     const { marketAvailability } = require('@/store/sagas/clientApis/conversationalAI/marketAvailability');
     marketAvailability.mockResolvedValue(false);
-    (fetchCityStateDetailFromZipCode as jest.Mock).mockResolvedValue({ error: true });
+    fetchCityStateDetailFromZipCode.mockResolvedValue({ error: true });
 
     render(<ProductDescription {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /choose/i }));
@@ -197,14 +198,13 @@ describe('ProductDescription', () => {
     render(<ProductDescription {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /choose/i }));
 
-    const modal = await screen.findByTestId('update-zip-code-modal');
-    expect(modal).toBeInTheDocument();
+    expect(await screen.findByTestId('update-zip-code-modal')).toBeInTheDocument();
 
     localStorage.setItem('addressDetails', JSON.stringify({ zip_code: '12345' }));
     fireEvent.click(screen.getByTestId('close-zip-modal'));
 
-    await waitFor(() =>
-      expect(screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(screen.queryByTestId('update-zip-code-modal')).not.toBeInTheDocument();
+    });
   });
 });
