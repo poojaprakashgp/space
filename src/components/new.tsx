@@ -10,3 +10,5 @@ This is the standard accessibility pattern across browsers, NVDA, JAWS, VoiceOve
 
 
   This is the expected behavior on mobile — when focus is inside the chat window, scroll is contained within the chat. When focus is outside, the page scrolls. No changes needed.”
+
+https://verizon.webex.com/verizon/j.php?MTID=m455db4f04c06392009e727138a6f5a6a
