@@ -48,3 +48,8 @@ const GetUserIP = () => {
 };
 
 export default GetUserIP;
+
+Issue with Funding Source API – Billing Address Not Verified
+We are facing an issue with the Funding Source API where, even with proper and valid details, we are inconsistently receiving the error message: “Billing address was not verified.”
+This occurs intermittently, and we have not been able to identify the root cause from our end despite multiple checks. Could you please help us investigate this issue and advise on possible reasons or steps to resolve it?
+Looking forward to your guidance.
