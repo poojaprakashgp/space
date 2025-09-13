@@ -6,7 +6,6 @@ import ProtectedRoutes from './ProtectedRoutes';
 import ProgressBarContainer from './progressBarContainer.js';
 
 const Body = () => {
-
     const appRouter = createBrowserRouter([
         {
             path: '/',
@@ -20,7 +19,8 @@ const Body = () => {
             path: '/progressbar',
             element: <ProgressBarContainer />
         }
-    ])
+    ]);
+    
   return (
     <div>
        <RouterProvider router={appRouter} />
