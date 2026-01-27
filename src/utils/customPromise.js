@@ -154,3 +154,75 @@ promise.then(
   }
 })(this);
 
+
+function MyPromise(executor) {
+  let state = "PENDING";
+  let value = undefined;
+
+  let onFulfilledCallbacks = [];
+  let onRejectedCallbacks = [];
+
+  function resolve(result) {
+    if (state !== "PENDING") return;
+
+    state = "FULFILLED";
+    value = result;
+
+    onFulfilledCallbacks.forEach(cb => cb(value));
+  }
+
+  function reject(error) {
+    if (state !== "PENDING") return;
+
+    state = "REJECTED";
+    value = error;
+
+    onRejectedCallbacks.forEach(cb => cb(value));
+  }
+
+  try {
+    executor(resolve, reject);
+  } catch (err) {
+    reject(err);
+  }
+
+  this.then = function (onFulfilled, onRejected) {
+    return new MyPromise((resolve, reject) => {
+      function handleFulfilled(val) {
+        try {
+          const result = onFulfilled ? onFulfilled(val) : val;
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      }
+
+      function handleRejected(err) {
+        try {
+          if (onRejected) {
+            const result = onRejected(err);
+            resolve(result);
+          } else {
+            reject(err);
+          }
+        } catch (error) {
+          reject(error);
+        }
+      }
+
+      if (state === "FULFILLED") {
+        setTimeout(() => handleFulfilled(value), 0);
+      } else if (state === "REJECTED") {
+        setTimeout(() => handleRejected(value), 0);
+      } else {
+        onFulfilledCallbacks.push(handleFulfilled);
+        onRejectedCallbacks.push(handleRejected);
+      }
+    });
+  };
+
+  this.catch = function (onRejected) {
+    return this.then(null, onRejected);
+  };
+}
+
